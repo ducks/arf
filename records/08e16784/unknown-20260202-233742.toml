@@ -1,0 +1,5 @@
+what = "Add TUI browser"
+why = "Interactive exploration of git+arf history"
+how = "ratatui with commit list, reasoning panel, toggleable diff"
+timestamp = "2026-02-02T23:37:42.497261140+00:00"
+commit = "08e1678482a552351ef00bf3e0cbdbdc48eabd69"
