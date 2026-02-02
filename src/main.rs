@@ -71,6 +71,17 @@ enum Commands {
         #[arg(short, long, default_value = "10")]
         limit: usize,
     },
+
+    /// Show diff with ARF reasoning context
+    Diff {
+        /// Commit to diff (defaults to HEAD)
+        #[arg(short, long)]
+        commit: Option<String>,
+
+        /// Show full diff instead of stat summary
+        #[arg(long)]
+        full: bool,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -105,6 +116,7 @@ fn main() -> Result<()> {
         Commands::Log { commit, limit } => cmd_log(commit, limit)?,
         Commands::Sync { push, pull } => cmd_sync(push, pull)?,
         Commands::Graph { limit } => cmd_graph(limit)?,
+        Commands::Diff { commit, full } => cmd_diff(commit, full)?,
     }
 
     Ok(())
@@ -500,6 +512,112 @@ fn cmd_graph(limit: usize) -> Result<()> {
 
     if !has_arf {
         println!("\n(ARF not initialized - run 'arf init' for reasoning context)");
+    }
+
+    Ok(())
+}
+
+fn cmd_diff(commit: Option<String>, full: bool) -> Result<()> {
+    // Get the commit SHA (default to HEAD)
+    let sha = match commit {
+        Some(c) => c,
+        None => {
+            let output = Command::new("git")
+                .args(["rev-parse", "HEAD"])
+                .output()?;
+            if !output.status.success() {
+                return Err(anyhow!("Failed to get HEAD"));
+            }
+            String::from_utf8_lossy(&output.stdout).trim().to_string()
+        }
+    };
+
+    // Get commit info
+    let output = Command::new("git")
+        .args(["log", "-1", "--oneline", &sha])
+        .output()?;
+
+    if !output.status.success() {
+        return Err(anyhow!("Commit not found: {}", sha));
+    }
+
+    let commit_line = String::from_utf8_lossy(&output.stdout);
+    let commit_line = commit_line.trim();
+
+    // Print ARF context first
+    let records_dir = Path::new(".arf/records");
+    let short_sha = &sha[..8.min(sha.len())];
+
+    println!("═══════════════════════════════════════════════════════════════");
+    println!("Commit: {}", commit_line);
+    println!("═══════════════════════════════════════════════════════════════");
+
+    if records_dir.exists() {
+        // Find matching records dir (match either direction for flexibility)
+        let commit_records_dir = std::fs::read_dir(&records_dir)
+            .ok()
+            .and_then(|entries| {
+                entries
+                    .filter_map(|e| e.ok())
+                    .find(|e| {
+                        let dir_name = e.file_name().to_string_lossy().to_string();
+                        dir_name.starts_with(short_sha) || short_sha.starts_with(&dir_name)
+                    })
+                    .map(|e| e.path())
+            });
+
+        if let Some(dir) = commit_records_dir {
+            if let Ok(entries) = std::fs::read_dir(&dir) {
+                let mut records: Vec<ArfRecord> = Vec::new();
+
+                for entry in entries.filter_map(|e| e.ok()) {
+                    let path = entry.path();
+                    if path.extension().map_or(false, |e| e == "toml") {
+                        if let Ok(content) = std::fs::read_to_string(&path) {
+                            if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
+                                records.push(record);
+                            }
+                        }
+                    }
+                }
+
+                records.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+
+                if !records.is_empty() {
+                    println!();
+                    println!("REASONING:");
+                    for record in &records {
+                        println!("  what: {}", record.what);
+                        println!("  why:  {}", record.why);
+                        if let Some(ref how) = record.how {
+                            println!("  how:  {}", how);
+                        }
+                        println!();
+                    }
+                }
+            }
+        } else {
+            println!();
+            println!("(no ARF record for this commit)");
+            println!();
+        }
+    }
+
+    println!("───────────────────────────────────────────────────────────────");
+    println!("CHANGES:");
+    println!();
+
+    // Show diff
+    let diff_args = if full {
+        vec!["show", "--format=", &sha]
+    } else {
+        vec!["show", "--stat", "--format=", &sha]
+    };
+
+    let diff_output = Command::new("git").args(&diff_args).output()?;
+
+    if diff_output.status.success() {
+        print!("{}", String::from_utf8_lossy(&diff_output.stdout));
     }
 
     Ok(())
