@@ -1,0 +1,5 @@
+what = "Add graph command for unified git+arf visualization"
+why = "Enables reviewing git history with reasoning context in one view"
+how = "Matches commit SHAs to .arf/records directories, renders tree-style output"
+timestamp = "2026-02-02T23:18:16.336998283+00:00"
+commit = "8ec6c985b9200de2bfecaee39242fa4c515861d6"
