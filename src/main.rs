@@ -654,12 +654,26 @@ enum DiffMode {
     Full,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Focus {
+    Commits,
+    Diff,
+}
+
 struct App {
     commits: Vec<CommitInfo>,
     list_state: ListState,
     diff_mode: DiffMode,
-    diff_content: String,
+    diff_lines: Vec<DiffLine>,
+    diff_scroll: usize,
+    focus: Focus,
     should_quit: bool,
+}
+
+#[derive(Debug, Clone)]
+struct DiffLine {
+    content: String,
+    style: Style,
 }
 
 impl App {
@@ -672,7 +686,9 @@ impl App {
             commits,
             list_state,
             diff_mode: DiffMode::Stat,
-            diff_content: String::new(),
+            diff_lines: Vec::new(),
+            diff_scroll: 0,
+            focus: Focus::Commits,
             should_quit: false,
         }
     }
@@ -682,33 +698,60 @@ impl App {
     }
 
     fn next(&mut self) {
-        if self.commits.is_empty() {
-            return;
+        match self.focus {
+            Focus::Commits => {
+                if self.commits.is_empty() {
+                    return;
+                }
+                let i = match self.list_state.selected() {
+                    Some(i) => (i + 1) % self.commits.len(),
+                    None => 0,
+                };
+                self.list_state.select(Some(i));
+                self.diff_scroll = 0;
+                self.update_diff();
+            }
+            Focus::Diff => {
+                if self.diff_scroll < self.diff_lines.len().saturating_sub(1) {
+                    self.diff_scroll += 1;
+                }
+            }
         }
-        let i = match self.list_state.selected() {
-            Some(i) => (i + 1) % self.commits.len(),
-            None => 0,
-        };
-        self.list_state.select(Some(i));
-        self.update_diff();
     }
 
     fn previous(&mut self) {
-        if self.commits.is_empty() {
-            return;
-        }
-        let i = match self.list_state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.commits.len() - 1
-                } else {
-                    i - 1
+        match self.focus {
+            Focus::Commits => {
+                if self.commits.is_empty() {
+                    return;
                 }
+                let i = match self.list_state.selected() {
+                    Some(i) => {
+                        if i == 0 {
+                            self.commits.len() - 1
+                        } else {
+                            i - 1
+                        }
+                    }
+                    None => 0,
+                };
+                self.list_state.select(Some(i));
+                self.diff_scroll = 0;
+                self.update_diff();
             }
-            None => 0,
-        };
-        self.list_state.select(Some(i));
-        self.update_diff();
+            Focus::Diff => {
+                self.diff_scroll = self.diff_scroll.saturating_sub(1);
+            }
+        }
+    }
+
+    fn toggle_focus(&mut self) {
+        if self.diff_mode != DiffMode::Hidden {
+            self.focus = match self.focus {
+                Focus::Commits => Focus::Diff,
+                Focus::Diff => Focus::Commits,
+            };
+        }
     }
 
     fn toggle_diff(&mut self) {
@@ -717,17 +760,33 @@ impl App {
             DiffMode::Stat => DiffMode::Full,
             DiffMode::Full => DiffMode::Hidden,
         };
+        if self.diff_mode == DiffMode::Hidden {
+            self.focus = Focus::Commits;
+        }
+        self.diff_scroll = 0;
         self.update_diff();
     }
 
+    fn page_down(&mut self) {
+        if self.focus == Focus::Diff {
+            self.diff_scroll = (self.diff_scroll + 10).min(self.diff_lines.len().saturating_sub(1));
+        }
+    }
+
+    fn page_up(&mut self) {
+        if self.focus == Focus::Diff {
+            self.diff_scroll = self.diff_scroll.saturating_sub(10);
+        }
+    }
+
     fn update_diff(&mut self) {
+        self.diff_lines.clear();
+
         if self.diff_mode == DiffMode::Hidden {
-            self.diff_content.clear();
             return;
         }
 
         let Some(commit) = self.selected_commit() else {
-            self.diff_content.clear();
             return;
         };
 
@@ -738,10 +797,29 @@ impl App {
         };
 
         let output = Command::new("git").args(&args).output();
-        self.diff_content = match output {
+        let content = match output {
             Ok(o) if o.status.success() => String::from_utf8_lossy(&o.stdout).to_string(),
             _ => "Failed to get diff".to_string(),
         };
+
+        // Parse lines with syntax highlighting
+        for line in content.lines() {
+            let (style, display) = if line.starts_with('+') && !line.starts_with("+++") {
+                (Style::default().fg(Color::Green), line.to_string())
+            } else if line.starts_with('-') && !line.starts_with("---") {
+                (Style::default().fg(Color::Red), line.to_string())
+            } else if line.starts_with("@@") {
+                (Style::default().fg(Color::Cyan), line.to_string())
+            } else if line.starts_with("diff ") || line.starts_with("index ") {
+                (Style::default().fg(Color::Yellow).bold(), line.to_string())
+            } else if line.starts_with("+++") || line.starts_with("---") {
+                (Style::default().fg(Color::Yellow), line.to_string())
+            } else {
+                (Style::default(), line.to_string())
+            };
+
+            self.diff_lines.push(DiffLine { content: display, style });
+        }
     }
 }
 
@@ -834,7 +912,10 @@ fn cmd_browse() -> Result<()> {
                     KeyCode::Char('q') | KeyCode::Esc => app.should_quit = true,
                     KeyCode::Down | KeyCode::Char('j') => app.next(),
                     KeyCode::Up | KeyCode::Char('k') => app.previous(),
-                    KeyCode::Char('d') | KeyCode::Tab => app.toggle_diff(),
+                    KeyCode::Char('d') => app.toggle_diff(),
+                    KeyCode::Tab | KeyCode::Enter => app.toggle_focus(),
+                    KeyCode::PageDown | KeyCode::Char('f') => app.page_down(),
+                    KeyCode::PageUp | KeyCode::Char('b') => app.page_up(),
                     _ => {}
                 }
             }
@@ -854,6 +935,10 @@ fn cmd_browse() -> Result<()> {
 
 fn ui(frame: &mut Frame, app: &mut App) {
     let has_diff = app.diff_mode != DiffMode::Hidden;
+
+    // Border styles based on focus
+    let focused_border = Style::default().fg(Color::Cyan);
+    let unfocused_border = Style::default();
 
     // Main layout
     let main_chunks = Layout::default()
@@ -881,11 +966,18 @@ fn ui(frame: &mut Frame, app: &mut App) {
         })
         .collect();
 
+    let commits_border = if app.focus == Focus::Commits {
+        focused_border
+    } else {
+        unfocused_border
+    };
+
     let commits_list = List::new(items)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title(" Commits [j/k to navigate] "),
+                .border_style(commits_border)
+                .title(" Commits "),
         )
         .highlight_style(Style::default().bg(Color::DarkGray).bold())
         .highlight_symbol("→ ");
@@ -929,21 +1021,48 @@ fn ui(frame: &mut Frame, app: &mut App) {
 
     // Diff panel (if visible)
     if has_diff {
+        let diff_border = if app.focus == Focus::Diff {
+            focused_border
+        } else {
+            unfocused_border
+        };
+
         let diff_title = match app.diff_mode {
-            DiffMode::Stat => " Diff (stat) [d to toggle] ",
-            DiffMode::Full => " Diff (full) [d to toggle] ",
+            DiffMode::Stat => " Diff (stat) ",
+            DiffMode::Full => " Diff (full) ",
             DiffMode::Hidden => "",
         };
 
-        let diff = Paragraph::new(app.diff_content.clone())
-            .block(Block::default().borders(Borders::ALL).title(diff_title))
-            .wrap(Wrap { trim: false });
+        // Build styled lines from diff_lines
+        let lines: Vec<Line> = app
+            .diff_lines
+            .iter()
+            .skip(app.diff_scroll)
+            .map(|dl| Line::from(Span::styled(dl.content.clone(), dl.style)))
+            .collect();
+
+        let scroll_info = if !app.diff_lines.is_empty() {
+            format!(
+                " [{}/{}] ",
+                app.diff_scroll + 1,
+                app.diff_lines.len()
+            )
+        } else {
+            String::new()
+        };
+
+        let diff = Paragraph::new(lines).block(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(diff_border)
+                .title(format!("{}{}", diff_title, scroll_info)),
+        );
 
         frame.render_widget(diff, main_chunks[1]);
     }
 
     // Help bar at bottom
-    let help = " q: quit | j/k: navigate | d: toggle diff (hidden/stat/full) ";
+    let help = " q: quit | j/k: scroll | Tab: focus | d: toggle diff | f/b: page ";
     let help_area = Rect {
         x: 0,
         y: frame.area().height - 1,
