@@ -1,0 +1,5 @@
+what = "Add diff command"
+why = "Combine git diff with ARF reasoning for full context review"
+how = "Shows reasoning header then git show output, --stat default with --full option"
+timestamp = "2026-02-02T23:21:33.932841303+00:00"
+commit = "8ae882e6563d67144d62edd226cebeca9e49c9a1"
