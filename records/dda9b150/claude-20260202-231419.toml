@@ -1,0 +1,7 @@
+what = "Implement ARF CLI v0.1"
+why = "Need reference implementation for Agent Reasoning Format spec"
+how = "Rust CLI with init/record/log/sync commands, orphan branch storage"
+backup = "Revert to spec-only if implementation has issues"
+timestamp = "2026-02-02T23:14:19.855426001+00:00"
+commit = "dda9b15061cd870ccd456ff86ea03282a6f90f46"
+agent = "claude"
