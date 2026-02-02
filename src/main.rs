@@ -64,6 +64,13 @@ enum Commands {
         #[arg(long)]
         pull: bool,
     },
+
+    /// Show git commits with ARF reasoning
+    Graph {
+        /// Number of commits to show
+        #[arg(short, long, default_value = "10")]
+        limit: usize,
+    },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -97,6 +104,7 @@ fn main() -> Result<()> {
         } => cmd_record(what, why, how, backup, commit)?,
         Commands::Log { commit, limit } => cmd_log(commit, limit)?,
         Commands::Sync { push, pull } => cmd_sync(push, pull)?,
+        Commands::Graph { limit } => cmd_graph(limit)?,
     }
 
     Ok(())
@@ -391,6 +399,107 @@ fn cmd_sync(push: bool, pull: bool) -> Result<()> {
             let stderr = String::from_utf8_lossy(&output.stderr);
             println!("  Push failed: {}", stderr.trim());
         }
+    }
+
+    Ok(())
+}
+
+fn cmd_graph(limit: usize) -> Result<()> {
+    // Get git log
+    let output = Command::new("git")
+        .args([
+            "log",
+            "--oneline",
+            "--no-decorate",
+            &format!("-{}", limit),
+        ])
+        .output()?;
+
+    if !output.status.success() {
+        return Err(anyhow!("Failed to get git log"));
+    }
+
+    let log = String::from_utf8_lossy(&output.stdout);
+    let commits: Vec<&str> = log.lines().collect();
+
+    if commits.is_empty() {
+        println!("No commits found.");
+        return Ok(());
+    }
+
+    let records_dir = Path::new(".arf/records");
+    let has_arf = records_dir.exists();
+
+    println!("Git + ARF History:\n");
+
+    for (i, line) in commits.iter().enumerate() {
+        let parts: Vec<&str> = line.splitn(2, ' ').collect();
+        let (sha, msg) = if parts.len() == 2 {
+            (parts[0], parts[1])
+        } else {
+            (parts[0], "")
+        };
+
+        // Graph connector
+        let is_last = i == commits.len() - 1;
+        let connector = if is_last { "└" } else { "├" };
+        let continuation = if is_last { " " } else { "│" };
+
+        // Print commit line
+        println!("{}─● {} {}", connector, sha, msg);
+
+        // Check for ARF records for this commit
+        if has_arf {
+            // Try to find matching records dir (git log shows 7 chars, records use 8)
+            let commit_records_dir = if let Ok(entries) = std::fs::read_dir(&records_dir) {
+                entries
+                    .filter_map(|e| e.ok())
+                    .find(|e| {
+                        e.file_name()
+                            .to_string_lossy()
+                            .starts_with(sha)
+                    })
+                    .map(|e| e.path())
+            } else {
+                None
+            };
+
+            if let Some(commit_records_dir) = commit_records_dir {
+                if let Ok(entries) = std::fs::read_dir(&commit_records_dir) {
+                    let mut records: Vec<ArfRecord> = Vec::new();
+
+                    for entry in entries.filter_map(|e| e.ok()) {
+                        let path = entry.path();
+                        if path.extension().map_or(false, |e| e == "toml") {
+                            if let Ok(content) = std::fs::read_to_string(&path) {
+                                if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
+                                    records.push(record);
+                                }
+                            }
+                        }
+                    }
+
+                    // Sort by timestamp
+                    records.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+
+                    for (j, record) in records.iter().enumerate() {
+                        let is_last_record = j == records.len() - 1;
+                        let rec_connector = if is_last_record { "└" } else { "├" };
+
+                        println!("{}  {}─ what: {}", continuation, rec_connector, record.what);
+                        println!("{}  {}   why: {}", continuation, if is_last_record { " " } else { "│" }, record.why);
+
+                        if let Some(ref how) = record.how {
+                            println!("{}  {}   how: {}", continuation, if is_last_record { " " } else { "│" }, how);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if !has_arf {
+        println!("\n(ARF not initialized - run 'arf init' for reasoning context)");
     }
 
     Ok(())
