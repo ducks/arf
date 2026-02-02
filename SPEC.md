@@ -14,17 +14,17 @@ agents to declare intent and capture reasoning in a way that:
 
 ## Core Schema
 
-An ARF record has these fields:
+An ARF record in TOML:
 
-```json
-{
-  "what": "string (required)",
-  "why": "string (required)",
-  "how": "string (optional)",
-  "backup": "string (optional)",
-  "outcome": "success | failure | partial (optional)",
-  "context": {}
-}
+```toml
+what = "string (required)"
+why = "string (required)"
+how = "string (optional)"
+backup = "string (optional)"
+outcome = "success | failure | partial (optional)"
+
+[context]
+# arbitrary metadata
 ```
 
 ### Required Fields
@@ -52,46 +52,40 @@ Can include details: `{"outcome": "failure", "reason": "tests failed"}`.
 
 Agent declares intent BEFORE acting:
 
-```json
-{
-  "what": "Add input validation to user registration",
-  "why": "Current code allows SQL injection via email field",
-  "how": "Add parameterized queries in register_user()",
-  "backup": "Revert commit if integration tests fail"
-}
+```toml
+what = "Add input validation to user registration"
+why = "Current code allows SQL injection via email field"
+how = "Add parameterized queries in register_user()"
+backup = "Revert commit if integration tests fail"
 ```
 
 ### 2. Post-Action Record
 
 Agent records what happened AFTER acting:
 
-```json
-{
-  "what": "Add input validation to user registration",
-  "why": "Current code allows SQL injection via email field",
-  "how": "Added parameterized queries in register_user()",
-  "outcome": "success",
-  "context": {
-    "commit": "abc123",
-    "files_changed": ["src/auth.rs"]
-  }
-}
+```toml
+what = "Add input validation to user registration"
+why = "Current code allows SQL injection via email field"
+how = "Added parameterized queries in register_user()"
+outcome = "success"
+
+[context]
+commit = "abc123"
+files_changed = ["src/auth.rs"]
 ```
 
 ### 3. Multi-Agent Handoff
 
 Agent A passes structured reasoning to Agent B:
 
-```json
-{
-  "what": "Identified N+1 query in user_posts()",
-  "why": "Each post triggers separate author lookup",
-  "how": "Recommend eager loading with includes(:author)",
-  "context": {
-    "source_agent": "analyzer",
-    "confidence": 0.95
-  }
-}
+```toml
+what = "Identified N+1 query in user_posts()"
+why = "Each post triggers separate author lookup"
+how = "Recommend eager loading with includes(:author)"
+
+[context]
+source_agent = "analyzer"
+confidence = 0.95
 ```
 
 ## Prompt Template
@@ -120,52 +114,46 @@ DO NOT narrate your investigation. Output ONLY the structured reasoning.
 
 ### Bug Fix
 
-```json
-{
-  "what": "Fix off-by-one error in pagination",
-  "why": "Users report missing last item on each page. Loop uses < instead of <=",
-  "how": "Change line 42: `i < count` to `i <= count`",
-  "backup": "Revert if pagination tests fail",
-  "outcome": "success",
-  "context": {
-    "issue": "#123",
-    "commit": "def456"
-  }
-}
+```toml
+what = "Fix off-by-one error in pagination"
+why = "Users report missing last item on each page. Loop uses < instead of <="
+how = "Change line 42: `i < count` to `i <= count`"
+backup = "Revert if pagination tests fail"
+outcome = "success"
+
+[context]
+issue = "#123"
+commit = "def456"
 ```
 
 ### Architecture Decision
 
-```json
-{
-  "what": "Use Redis for session storage instead of PostgreSQL",
-  "why": "Session lookups are 100x more frequent than writes. Redis reduces p99 latency from 50ms to 2ms",
-  "how": "Add redis-rs dependency, implement SessionStore trait",
-  "backup": "Keep PostgreSQL adapter as fallback if Redis unavailable"
-}
+```toml
+what = "Use Redis for session storage instead of PostgreSQL"
+why = "Session lookups are 100x more frequent than writes. Redis reduces p99 latency from 50ms to 2ms"
+how = "Add redis-rs dependency, implement SessionStore trait"
+backup = "Keep PostgreSQL adapter as fallback if Redis unavailable"
 ```
 
 ### Code Review Finding
 
-```json
-{
-  "what": "Flag potential race condition in cache invalidation",
-  "why": "delete() and set() not atomic - stale data possible under load",
-  "how": "Recommend using WATCH/MULTI/EXEC or lua script",
-  "context": {
-    "file": "src/cache.rs",
-    "line": 89,
-    "severity": "medium"
-  }
-}
+```toml
+what = "Flag potential race condition in cache invalidation"
+why = "delete() and set() not atomic - stale data possible under load"
+how = "Recommend using WATCH/MULTI/EXEC or lua script"
+
+[context]
+file = "src/cache.rs"
+line = 89
+severity = "medium"
 ```
 
 ## File Format
 
 ARF records can be stored as:
 
-- **JSON** - Single record or array of records
-- **JSONL** - One record per line (for logs/streams)
+- **TOML** - Single record per `.arf` file or embedded in other TOML
+- **TOML stream** - Multiple `[[record]]` entries in one file
 - **Embedded** - In commit messages, PR descriptions, comments
 
 ## Versioning

@@ -11,15 +11,13 @@ AI agents modify code, make decisions, take actions. Their reasoning is:
 
 ## The Solution
 
-ARF is a simple schema for capturing agent reasoning:
+ARF is a simple TOML schema for capturing agent reasoning:
 
-```json
-{
-  "what": "Add validation to prevent SQL injection",
-  "why": "Email field passes unsanitized input to query",
-  "how": "Use parameterized queries in register_user()",
-  "backup": "Revert if tests fail"
-}
+```toml
+what = "Add validation to prevent SQL injection"
+why = "Email field passes unsanitized input to query"
+how = "Use parameterized queries in register_user()"
+backup = "Revert if tests fail"
 ```
 
 ## Use Cases
