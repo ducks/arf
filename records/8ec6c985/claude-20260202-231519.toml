@@ -1,0 +1,6 @@
+what = "Commit ARF CLI implementation"
+why = "First working version ready for testing"
+how = "init/record/log/sync commands, orphan branch storage pattern from lok debate"
+timestamp = "2026-02-02T23:15:19.067228888+00:00"
+commit = "8ec6c985b9200de2bfecaee39242fa4c515861d6"
+agent = "claude"
