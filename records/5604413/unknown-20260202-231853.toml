@@ -1,0 +1,5 @@
+what = "Add graph command"
+why = "User requested visualization combining git commits with ARF reasoning records"
+how = "New cmd_graph function matches commit SHAs to .arf/records/ directories, renders tree-style output"
+timestamp = "2026-02-02T23:18:53.502624847+00:00"
+commit = "5604413"
