@@ -30,6 +30,12 @@ enum Commands {
     /// Initialize ARF tracking (creates orphan branch)
     Init,
 
+    /// Manage specs (task definitions)
+    Spec {
+        #[command(subcommand)]
+        command: SpecCommands,
+    },
+
     /// Record a reasoning entry
     Record {
         /// What action is being taken (required)
@@ -97,6 +103,18 @@ enum Commands {
     Browse,
 }
 
+#[derive(Subcommand)]
+enum SpecCommands {
+    /// List all specs
+    List,
+
+    /// Show a specific spec
+    Show {
+        /// Spec name (without .arf extension)
+        name: String,
+    },
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 struct ArfRecord {
     what: String,
@@ -119,6 +137,10 @@ fn main() -> Result<()> {
 
     match cli.command {
         Commands::Init => cmd_init()?,
+        Commands::Spec { command } => match command {
+            SpecCommands::List => cmd_spec_list()?,
+            SpecCommands::Show { name } => cmd_spec_show(&name)?,
+        },
         Commands::Record {
             what,
             why,
@@ -172,6 +194,7 @@ fn cmd_init() -> Result<()> {
 
     // Create initial structure
     std::fs::create_dir_all(".arf/records")?;
+    std::fs::create_dir_all(".arf/specs")?;
 
     // Create README in arf branch
     let readme = r#"# ARF Records
@@ -220,6 +243,66 @@ See https://github.com/ducks/arf for the ARF specification.
     Ok(())
 }
 
+fn cmd_spec_list() -> Result<()> {
+    let specs_dir = Path::new(".arf/specs");
+
+    if !specs_dir.exists() {
+        return Err(anyhow!(
+            "ARF not initialized or no specs directory. Run 'arf init' first."
+        ));
+    }
+
+    let mut specs: Vec<String> = Vec::new();
+
+    if let Ok(entries) = std::fs::read_dir(specs_dir) {
+        for entry in entries.filter_map(|e| e.ok()) {
+            let path = entry.path();
+            if path.extension().is_some_and(|e| e == "arf") {
+                if let Some(name) = path.file_stem() {
+                    specs.push(name.to_string_lossy().to_string());
+                }
+            }
+        }
+    }
+
+    if specs.is_empty() {
+        println!("No specs found in .arf/specs/");
+        println!();
+        println!("Generate specs with: lok spec \"your task description\"");
+        return Ok(());
+    }
+
+    specs.sort();
+
+    println!("Specs ({}):\n", specs.len());
+    for name in &specs {
+        println!("  {}", name);
+    }
+    println!();
+    println!("Show details: arf spec show <name>");
+
+    Ok(())
+}
+
+fn cmd_spec_show(name: &str) -> Result<()> {
+    let specs_dir = Path::new(".arf/specs");
+    let spec_path = specs_dir.join(format!("{}.arf", name));
+
+    if !spec_path.exists() {
+        return Err(anyhow!("Spec not found: {}", name));
+    }
+
+    let content = std::fs::read_to_string(&spec_path)?;
+
+    println!("═══════════════════════════════════════════════════════════════");
+    println!("Spec: {}", name);
+    println!("═══════════════════════════════════════════════════════════════");
+    println!();
+    print!("{}", content);
+
+    Ok(())
+}
+
 fn cmd_record(
     what: String,
     why: String,
@@ -236,9 +319,7 @@ fn cmd_record(
     let commit_sha = match commit {
         Some(c) => c,
         None => {
-            let output = Command::new("git")
-                .args(["rev-parse", "HEAD"])
-                .output()?;
+            let output = Command::new("git").args(["rev-parse", "HEAD"]).output()?;
             if !output.status.success() {
                 return Err(anyhow!("Failed to get HEAD commit"));
             }
@@ -333,7 +414,7 @@ fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
         if let Ok(entries) = std::fs::read_dir(&dir) {
             for entry in entries.filter_map(|e| e.ok()) {
                 let path = entry.path();
-                if path.extension().map_or(false, |e| e == "toml") {
+                if path.extension().is_some_and(|e| e == "toml") {
                     if let Ok(content) = std::fs::read_to_string(&path) {
                         if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
                             let filename = path.file_name().unwrap().to_string_lossy().to_string();
@@ -433,12 +514,7 @@ fn cmd_sync(push: bool, pull: bool) -> Result<()> {
 fn cmd_graph(limit: usize) -> Result<()> {
     // Get git log
     let output = Command::new("git")
-        .args([
-            "log",
-            "--oneline",
-            "--no-decorate",
-            &format!("-{}", limit),
-        ])
+        .args(["log", "--oneline", "--no-decorate", &format!("-{}", limit)])
         .output()?;
 
     if !output.status.success() {
@@ -477,14 +553,10 @@ fn cmd_graph(limit: usize) -> Result<()> {
         // Check for ARF records for this commit
         if has_arf {
             // Try to find matching records dir (git log shows 7 chars, records use 8)
-            let commit_records_dir = if let Ok(entries) = std::fs::read_dir(&records_dir) {
+            let commit_records_dir = if let Ok(entries) = std::fs::read_dir(records_dir) {
                 entries
                     .filter_map(|e| e.ok())
-                    .find(|e| {
-                        e.file_name()
-                            .to_string_lossy()
-                            .starts_with(sha)
-                    })
+                    .find(|e| e.file_name().to_string_lossy().starts_with(sha))
                     .map(|e| e.path())
             } else {
                 None
@@ -496,7 +568,7 @@ fn cmd_graph(limit: usize) -> Result<()> {
 
                     for entry in entries.filter_map(|e| e.ok()) {
                         let path = entry.path();
-                        if path.extension().map_or(false, |e| e == "toml") {
+                        if path.extension().is_some_and(|e| e == "toml") {
                             if let Ok(content) = std::fs::read_to_string(&path) {
                                 if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
                                     records.push(record);
@@ -513,10 +585,20 @@ fn cmd_graph(limit: usize) -> Result<()> {
                         let rec_connector = if is_last_record { "└" } else { "├" };
 
                         println!("{}  {}─ what: {}", continuation, rec_connector, record.what);
-                        println!("{}  {}   why: {}", continuation, if is_last_record { " " } else { "│" }, record.why);
+                        println!(
+                            "{}  {}   why: {}",
+                            continuation,
+                            if is_last_record { " " } else { "│" },
+                            record.why
+                        );
 
                         if let Some(ref how) = record.how {
-                            println!("{}  {}   how: {}", continuation, if is_last_record { " " } else { "│" }, how);
+                            println!(
+                                "{}  {}   how: {}",
+                                continuation,
+                                if is_last_record { " " } else { "│" },
+                                how
+                            );
                         }
                     }
                 }
@@ -536,9 +618,7 @@ fn cmd_diff(commit: Option<String>, full: bool) -> Result<()> {
     let sha = match commit {
         Some(c) => c,
         None => {
-            let output = Command::new("git")
-                .args(["rev-parse", "HEAD"])
-                .output()?;
+            let output = Command::new("git").args(["rev-parse", "HEAD"]).output()?;
             if !output.status.success() {
                 return Err(anyhow!("Failed to get HEAD"));
             }
@@ -568,17 +648,15 @@ fn cmd_diff(commit: Option<String>, full: bool) -> Result<()> {
 
     if records_dir.exists() {
         // Find matching records dir (match either direction for flexibility)
-        let commit_records_dir = std::fs::read_dir(&records_dir)
-            .ok()
-            .and_then(|entries| {
-                entries
-                    .filter_map(|e| e.ok())
-                    .find(|e| {
-                        let dir_name = e.file_name().to_string_lossy().to_string();
-                        dir_name.starts_with(short_sha) || short_sha.starts_with(&dir_name)
-                    })
-                    .map(|e| e.path())
-            });
+        let commit_records_dir = std::fs::read_dir(records_dir).ok().and_then(|entries| {
+            entries
+                .filter_map(|e| e.ok())
+                .find(|e| {
+                    let dir_name = e.file_name().to_string_lossy().to_string();
+                    dir_name.starts_with(short_sha) || short_sha.starts_with(&dir_name)
+                })
+                .map(|e| e.path())
+        });
 
         if let Some(dir) = commit_records_dir {
             if let Ok(entries) = std::fs::read_dir(&dir) {
@@ -586,7 +664,7 @@ fn cmd_diff(commit: Option<String>, full: bool) -> Result<()> {
 
                 for entry in entries.filter_map(|e| e.ok()) {
                     let path = entry.path();
-                    if path.extension().map_or(false, |e| e == "toml") {
+                    if path.extension().is_some_and(|e| e == "toml") {
                         if let Ok(content) = std::fs::read_to_string(&path) {
                             if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
                                 records.push(record);
@@ -818,7 +896,10 @@ impl App {
                 (Style::default(), line.to_string())
             };
 
-            self.diff_lines.push(DiffLine { content: display, style });
+            self.diff_lines.push(DiffLine {
+                content: display,
+                style,
+            });
         }
     }
 }
@@ -867,7 +948,7 @@ fn cmd_browse() -> Result<()> {
                         if let Ok(record_entries) = std::fs::read_dir(entry.path()) {
                             for record_entry in record_entries.filter_map(|e| e.ok()) {
                                 let path = record_entry.path();
-                                if path.extension().map_or(false, |e| e == "toml") {
+                                if path.extension().is_some_and(|e| e == "toml") {
                                     if let Ok(content) = std::fs::read_to_string(&path) {
                                         if let Ok(record) = toml::from_str::<ArfRecord>(&content) {
                                             records.push(record);
@@ -1010,11 +1091,7 @@ fn ui(frame: &mut Frame, app: &mut App) {
     };
 
     let reasoning = Paragraph::new(reasoning_text)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title(" Reasoning "),
-        )
+        .block(Block::default().borders(Borders::ALL).title(" Reasoning "))
         .wrap(Wrap { trim: false });
 
     frame.render_widget(reasoning, top_chunks[1]);
@@ -1042,11 +1119,7 @@ fn ui(frame: &mut Frame, app: &mut App) {
             .collect();
 
         let scroll_info = if !app.diff_lines.is_empty() {
-            format!(
-                " [{}/{}] ",
-                app.diff_scroll + 1,
-                app.diff_lines.len()
-            )
+            format!(" [{}/{}] ", app.diff_scroll + 1, app.diff_lines.len())
         } else {
             String::new()
         };
