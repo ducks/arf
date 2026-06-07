@@ -5,6 +5,7 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(name = "arf")]
+#[command(version)]
 #[command(about = "Agent Reasoning Format - track AI reasoning alongside git")]
 struct Cli {
     #[command(subcommand)]

@@ -59,6 +59,22 @@ fn run(dir: &assert_fs::TempDir, bin: &str, args: &[&str]) {
 }
 
 #[test]
+fn version_flag_reports_crate_version() {
+    // `arf --version` should print "arf <version>" where <version>
+    // matches CARGO_PKG_VERSION (the value in Cargo.toml). We don't
+    // assert an exact string because that would require the test to
+    // know the current version; instead, check the shape and that
+    // it includes the env-var value.
+    let dir = assert_fs::TempDir::new().unwrap();
+    let expected = env!("CARGO_PKG_VERSION");
+    arf(&dir)
+        .args(["--version"])
+        .assert()
+        .success()
+        .stdout(str::contains(expected));
+}
+
+#[test]
 fn init_succeeds_in_fresh_git_repo() {
     let dir = git_repo();
     arf(&dir).args(["init"]).assert().success();
