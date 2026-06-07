@@ -101,6 +101,29 @@ enum Commands {
 
     /// Interactive TUI browser
     Browse,
+
+    /// Dump records to stdout for piping into other tooling
+    Export {
+        /// Only export records linked to this commit
+        #[arg(short, long)]
+        commit: Option<String>,
+
+        /// Only export records with timestamp >= this RFC-3339 date/time
+        /// (e.g. "2026-06-01" or "2026-06-01T12:00:00Z")
+        #[arg(long)]
+        since: Option<String>,
+
+        /// Output format: json (default), jsonl (one record per line), toml
+        #[arg(short, long, default_value = "json")]
+        format: ExportFormat,
+    },
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum ExportFormat {
+    Json,
+    Jsonl,
+    Toml,
 }
 
 #[derive(Subcommand)]
@@ -153,6 +176,11 @@ fn main() -> Result<()> {
         Commands::Graph { limit } => cmd_graph(limit)?,
         Commands::Diff { commit, full } => cmd_diff(commit, full)?,
         Commands::Browse => cmd_browse()?,
+        Commands::Export {
+            commit,
+            since,
+            format,
+        } => cmd_export(commit, since, format)?,
     }
 
     Ok(())
@@ -383,7 +411,17 @@ fn cmd_record(
     Ok(())
 }
 
-fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
+// Walk .arf/records and return every record on disk, optionally
+// scoped to a single commit's directory. Records are returned newest
+// first by timestamp.
+//
+// Returns:
+//   - Vec<(filename, ArfRecord)> on success, possibly empty
+//   - Err if .arf is not initialized
+//
+// The Ok(empty) case includes "specific commit requested but no
+// records exist for it" - callers decide how to message that.
+fn load_records(commit: Option<&str>) -> Result<Vec<(String, ArfRecord)>> {
     if !Path::new(".arf/records").exists() {
         return Err(anyhow!("ARF not initialized. Run 'arf init' first."));
     }
@@ -391,16 +429,13 @@ fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
     let records_dir = Path::new(".arf/records");
     let mut all_records: Vec<(String, ArfRecord)> = Vec::new();
 
-    // If specific commit requested, only look there
-    let dirs_to_check: Vec<_> = if let Some(ref sha) = commit {
+    let dirs_to_check: Vec<_> = if let Some(sha) = commit {
         let short = &sha[..8.min(sha.len())];
         let path = records_dir.join(short);
-        if path.exists() {
-            vec![path]
-        } else {
-            println!("No records for commit {}", short);
-            return Ok(());
+        if !path.exists() {
+            return Ok(Vec::new());
         }
+        vec![path]
     } else {
         std::fs::read_dir(records_dir)?
             .filter_map(|e| e.ok())
@@ -409,7 +444,6 @@ fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
             .collect()
     };
 
-    // Read all records
     for dir in dirs_to_check {
         if let Ok(entries) = std::fs::read_dir(&dir) {
             for entry in entries.filter_map(|e| e.ok()) {
@@ -426,10 +460,23 @@ fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
         }
     }
 
-    // Sort by timestamp (newest first)
     all_records.sort_by(|a, b| b.1.timestamp.cmp(&a.1.timestamp));
+    Ok(all_records)
+}
 
-    // Limit
+fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
+    let all_records = load_records(commit.as_deref())?;
+
+    if all_records.is_empty() {
+        if let Some(ref sha) = commit {
+            let short = &sha[..8.min(sha.len())];
+            println!("No records for commit {}", short);
+        } else {
+            println!("No ARF records found.");
+        }
+        return Ok(());
+    }
+
     let records: Vec<_> = all_records.into_iter().take(limit).collect();
 
     if records.is_empty() {
@@ -457,6 +504,70 @@ fn cmd_log(commit: Option<String>, limit: usize) -> Result<()> {
         }
         println!("time: {}", record.timestamp);
         println!();
+    }
+
+    Ok(())
+}
+
+// Dump records to stdout for downstream consumers (CI scripts that
+// check for missing reasoning, dashboards, multi-agent handoffs).
+// Selection mirrors `log` (--commit, optional --since), but the
+// output format is machine-shaped rather than human-readable.
+//
+// --since accepts either a bare date ("2026-06-01") or a full
+// RFC-3339 timestamp. The bare-date case is widened to start-of-day
+// UTC so users don't have to remember timezone formatting.
+fn cmd_export(
+    commit: Option<String>,
+    since: Option<String>,
+    format: ExportFormat,
+) -> Result<()> {
+    let mut records = load_records(commit.as_deref())?;
+
+    if let Some(since_str) = since {
+        let normalized = if since_str.contains('T') {
+            since_str
+        } else {
+            format!("{}T00:00:00Z", since_str)
+        };
+        let cutoff = chrono::DateTime::parse_from_rfc3339(&normalized)
+            .map_err(|e| anyhow!("invalid --since value {:?}: {}", normalized, e))?;
+        records.retain(|(_, r)| match chrono::DateTime::parse_from_rfc3339(&r.timestamp) {
+            Ok(ts) => ts >= cutoff,
+            // Records with unparseable timestamps are kept on the
+            // theory that filtering them silently is worse than
+            // leaking them; the consumer can decide what to do.
+            Err(_) => true,
+        });
+    }
+
+    let plain: Vec<&ArfRecord> = records.iter().map(|(_, r)| r).collect();
+
+    match format {
+        ExportFormat::Json => {
+            let out = serde_json::to_string_pretty(&plain)?;
+            println!("{}", out);
+        }
+        ExportFormat::Jsonl => {
+            for record in &plain {
+                let line = serde_json::to_string(record)?;
+                println!("{}", line);
+            }
+        }
+        ExportFormat::Toml => {
+            // TOML doesn't natively support a top-level array, so wrap
+            // in a `records` table-array key. Round-trips back through
+            // toml::from_str cleanly with the wrapper.
+            #[derive(Serialize)]
+            struct Wrapper<'a> {
+                records: Vec<&'a ArfRecord>,
+            }
+            let wrapper = Wrapper {
+                records: plain.clone(),
+            };
+            let out = toml::to_string_pretty(&wrapper)?;
+            print!("{}", out);
+        }
     }
 
     Ok(())
