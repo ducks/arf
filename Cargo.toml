@@ -11,6 +11,10 @@ readme = "README.md"
 keywords = ["ai", "agent", "git", "reasoning", "cli"]
 categories = ["command-line-utilities", "development-tools"]
 
+[lib]
+name = "arf_cli"
+path = "src/lib.rs"
+
 [[bin]]
 name = "arf"
 path = "src/main.rs"
