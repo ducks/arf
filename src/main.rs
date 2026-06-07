@@ -373,8 +373,12 @@ fn cmd_record(
     let record_dir = format!(".arf/records/{}", short_sha);
     std::fs::create_dir_all(&record_dir)?;
 
-    // Generate filename
-    let timestamp = Utc::now().format("%Y%m%d-%H%M%S");
+    // Generate filename. Use nanosecond precision so multiple records
+    // created back-to-back in the same second don't collide on disk -
+    // earlier versions of this used second precision and silently
+    // overwrote each other when an agent emitted several records in
+    // quick succession (caught by integration tests).
+    let timestamp = Utc::now().format("%Y%m%d-%H%M%S%9f");
     let agent = record.agent.as_deref().unwrap_or("unknown");
     let filename = format!("{}/{}-{}.toml", record_dir, agent, timestamp);
 
