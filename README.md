@@ -1,26 +1,42 @@
 # ARF: Agent Reasoning Format
 
-A standard format for structured agent reasoning, tracked alongside git.
+`git blame` tells you who wrote this line. `arf why` tells you what they were thinking.
 
-## The Problem
+ARF is a TOML schema and CLI for capturing agent reasoning alongside
+git commits. Records live on an orphan branch keyed to commit SHAs;
+optionally anchored to specific files and line ranges. Reviewers
+(human or agent) can see what the agent thought, not just what it
+changed.
 
-AI agents modify code, make decisions, take actions. Their reasoning is:
+## The problem
+
+AI agents modify code, make decisions, take actions. Their
+reasoning is:
+
 - Buried in chat logs
 - Lost after the session ends
 - Unstructured and hard to review
 
-**Review the reasoning, not just the diff.**
+Review the reasoning, not just the diff.
 
-## The Solution
+## The format
 
-ARF is a simple TOML schema for capturing agent reasoning:
+A record is a TOML file with required `what` and `why`, optional
+`how`, `backup`, and `files`, plus auto-populated `timestamp`,
+`commit`, and `agent` fields:
 
 ```toml
 what = "Add validation to prevent SQL injection"
 why = "Email field passes unsanitized input to query"
 how = "Use parameterized queries in register_user()"
 backup = "Revert if tests fail"
+
+[[files]]
+path = "src/auth.rs"
+lines = [42, 76]
 ```
+
+See [SPEC.md](SPEC.md) for the full schema.
 
 ## Install
 
@@ -34,78 +50,95 @@ taken on crates.io); the installed binary is still called `arf`.
 ## CLI
 
 ```bash
-# Initialize ARF tracking (creates orphan branch at .arf/)
+# Initialize ARF tracking (creates orphan branch at .arf/).
+# Detects an existing local or remote arf branch and attaches a
+# worktree to it instead of erroring.
 arf init
 
-# Record reasoning for current work
-arf record --what "Add retry logic" --why "Transient API failures"
+# Record reasoning. --file is repeatable; each value is
+# `path[:start[-end]]`.
+arf record \
+  --what "Add retry logic" \
+  --why "Transient API failures cause cascading 503s under load" \
+  --how "3-attempt loop with 100/200/400ms backoff" \
+  --file src/api.rs:142-180
 
-# View reasoning history
+# Ask "why does this line exist?" - resolves file:line to a commit
+# via git blame, then prints reasoning records for that commit.
+arf why src/api.rs:155
+
+# Human-readable history.
 arf log
 
-# Combined git + reasoning visualization
+# Combined git + reasoning tree.
 arf graph
 
-# Show diff with reasoning context
+# A single commit with reasoning + diff.
 arf diff
+
+# Machine-shaped output for downstream tooling.
+arf export --format json
+arf export --format jsonl --since 2026-06-01
+arf export --format toml --commit abc123
+
+# Interactive TUI browser.
+arf browse
+
+# Push/pull the orphan branch from origin.
+arf sync
 ```
 
 ## Visualization
 
-### `arf graph` - Git history with reasoning
+### `arf why` - the headline command
+
+```
+$ arf why src/api.rs:155
+
+Reasoning for src/api.rs:155 (last touched in commit a3f9c012):
+
+what: Add retry logic
+why:  Transient API failures cause cascading 503s under load
+how:  3-attempt loop with 100/200/400ms backoff
+time: 2026-06-08T14:23:11+00:00
+```
+
+### `arf graph` - git history with reasoning
 
 ```
 Git + ARF History:
 
-├─● 8ae882e Add diff command with ARF reasoning context
-│  └─ what: Add diff command
-│      why: Combine git diff with ARF reasoning for full context review
-│      how: Shows reasoning header then git show output
-├─● 5604413 Add graph command for unified git+arf visualization
-│  └─ what: Add graph command
-│      why: User requested visualization combining git commits with reasoning
-│      how: Matches commit SHAs to .arf/records/ directories
-├─● 8ec6c98 Add ARF CLI reference implementation
-│  └─ what: Implement ARF CLI v0.1
-│      why: Need reference implementation for spec
-│      how: Rust CLI with init/record/log/sync commands
-└─● 3384a83 Initial ARF spec v0.1
+|-* 8ae882e Add diff command with ARF reasoning context
+|  +-- what: Add diff command
+|      why: Combine git diff with ARF reasoning for full context review
+|      how: Shows reasoning header then git show output
+|-* 5604413 Add graph command for unified git+arf visualization
+|  +-- what: Add graph command
+|      why: User requested visualization combining git commits with reasoning
+|      how: Matches commit SHAs to .arf/records/ directories
++-* 8ec6c98 Add ARF CLI reference implementation
+   +-- what: Implement ARF CLI v0.1
+       why: Need reference implementation for spec
+       how: Rust CLI with init/record/log/sync commands
 ```
 
-### `arf diff` - Single commit with reasoning + changes
+### `arf diff` - single commit with reasoning + changes
 
 ```
-═══════════════════════════════════════════════════════════════
+===============================================================
 Commit: 8ae882e Add diff command with ARF reasoning context
-═══════════════════════════════════════════════════════════════
+===============================================================
 
 REASONING:
   what: Add diff command
   why:  Combine git diff with ARF reasoning for full context review
   how:  Shows reasoning header then git show output
 
-───────────────────────────────────────────────────────────────
+---------------------------------------------------------------
 CHANGES:
 
  src/main.rs | 118 +++++++++++++++++++++++++++
  1 file changed, 118 insertions(+)
-```
-
-### `arf log` - Reasoning records
-
-```
-ARF Records (3):
-
-commit 8ae882e
-what: Add diff command
-why: Combine git diff with ARF reasoning for full context review
-how: Shows reasoning header then git show output
-time: 2026-02-02T21:18:45+00:00
-
-commit 5604413
-what: Add graph command
-why: User requested visualization combining git commits with reasoning
-time: 2026-02-02T21:15:32+00:00
 ```
 
 ## Storage
@@ -114,41 +147,51 @@ ARF uses an orphan git branch mounted as a worktree at `.arf/`:
 
 ```
 your-repo/
-├── .arf/                    # Mounted worktree (arf branch)
-│   ├── README.md
-│   └── records/
-│       ├── 8ae882e6/        # Records by commit SHA
-│       │   └── claude-20260202-211845.toml
-│       └── 5604413/
-│           └── claude-20260202-211532.toml
-├── .git/
-├── .gitignore               # Contains .arf/
-└── src/
++-- .arf/                    # mounted worktree (arf branch)
+|   +-- README.md
+|   +-- records/
+|       +-- 8ae882e6/        # records by short commit SHA
+|       |   +-- claude-20260202-211845.toml
+|       +-- 5604413/
+|           +-- claude-20260202-211532.toml
++-- .git/
++-- .gitignore               # contains .arf/
++-- src/
 ```
 
-Benefits:
-- Reasoning history separate from code history
-- No pollution of main branch commits
-- Standard git operations (push, pull, merge)
-- Works with existing git workflows
+The orphan branch keeps reasoning history separate from code
+history. Standard git operations work (push, pull, merge). A fresh
+clone of a repo that already has an `arf` branch gets attached to
+that branch via `arf init` rather than needing manual setup.
 
-## Use Cases
+## Use cases
 
-- **PR Review**: See why an agent made each change, not just the diff
-- **Multi-Agent**: Pass structured reasoning between agents
-- **Audit Trail**: Keep records of AI decisions for compliance
-- **Debugging**: Understand what went wrong when AI-generated code breaks
+- **PR review**: see why an agent made each change, not just the
+  diff.
+- **Multi-agent handoff**: pass structured reasoning between agents
+  via the `agent` field.
+- **Audit trail**: keep records of AI decisions for compliance.
+- **Debugging**: when AI-generated code breaks, find the reasoning
+  that produced it.
+- **`arf why <file>:<line>`**: the per-line lookup that closes the
+  loop between code and decision.
 
-## Installation
+## Using with Claude Code
+
+The companion skill at <https://github.com/ducks/arf-skill> teaches
+Claude Code when to emit ARF records during a session. Install via
+[skillz](https://github.com/ducks/skillz) or drop `SKILL.md` into
+your Claude Code skills directory:
 
 ```bash
-cargo install --git https://github.com/ducks/arf
+skillz install github:ducks/arf-skill
 ```
 
-## Spec
-
-See [SPEC.md](SPEC.md) for the full specification.
+After install, Claude will emit `arf record` calls automatically at
+significant decision points - before non-trivial changes, before
+commits, when changing strategy, when recovering from failures.
 
 ## Status
 
-v0.1 - Reference implementation. Feedback welcome.
+The CLI is on crates.io as `arf-cli`. The format spec is at
+[SPEC.md](SPEC.md). Feedback welcome via GitHub issues.
