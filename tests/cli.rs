@@ -346,6 +346,88 @@ fn export_commit_scopes_to_one_sha() {
 }
 
 #[test]
+fn record_accepts_file_flags() {
+    let dir = arf_repo();
+    arf(&dir)
+        .args([
+            "record",
+            "--what",
+            "Touched two files",
+            "--why",
+            "Refactor",
+            "--file",
+            "src/foo.rs",
+            "--file",
+            "src/bar.rs:42-60",
+        ])
+        .assert()
+        .success();
+
+    let out = arf(&dir).args(["export"]).assert().success();
+    let stdout = std::str::from_utf8(&out.get_output().stdout).unwrap();
+    let parsed: serde_json::Value = serde_json::from_str(stdout).unwrap();
+    let files = parsed[0]["files"].as_array().expect("files array");
+    assert_eq!(files.len(), 2);
+    assert_eq!(files[0]["path"], "src/foo.rs");
+    assert!(files[0]["lines"].is_null());
+    assert_eq!(files[1]["path"], "src/bar.rs");
+    assert_eq!(files[1]["lines"][0], 42);
+    assert_eq!(files[1]["lines"][1], 60);
+}
+
+#[test]
+fn why_returns_reasoning_for_specific_line() {
+    // Create a real file, commit it, record reasoning that scopes
+    // to a line range, then ask `arf why` about a line in that
+    // range. The blame lookup should resolve back to the commit
+    // and find the matching record.
+    let dir = arf_repo();
+
+    // Write and commit a small file.
+    std::fs::write(
+        dir.path().join("src.txt"),
+        "line one\nline two\nline three\nline four\n",
+    )
+    .unwrap();
+    run(&dir, "git", &["add", "src.txt"]);
+    run(&dir, "git", &["commit", "-q", "-m", "add src.txt"]);
+
+    arf(&dir)
+        .args([
+            "record",
+            "--what",
+            "Add src.txt with four sample lines",
+            "--why",
+            "Need a known-good fixture for the why test",
+            "--file",
+            "src.txt:2-3",
+        ])
+        .assert()
+        .success();
+
+    arf(&dir)
+        .args(["why", "src.txt:2"])
+        .assert()
+        .success()
+        .stdout(str::contains("Add src.txt with four sample lines"))
+        .stdout(str::contains("known-good fixture"));
+}
+
+#[test]
+fn why_reports_when_no_records_exist() {
+    let dir = arf_repo();
+    std::fs::write(dir.path().join("orphan.txt"), "one line\n").unwrap();
+    run(&dir, "git", &["add", "orphan.txt"]);
+    run(&dir, "git", &["commit", "-q", "-m", "add orphan"]);
+
+    arf(&dir)
+        .args(["why", "orphan.txt:1"])
+        .assert()
+        .success()
+        .stdout(str::contains("No ARF records"));
+}
+
+#[test]
 fn export_empty_when_no_records() {
     let dir = arf_repo();
     let out = arf(&dir).args(["export"]).assert().success();

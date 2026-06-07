@@ -1,6 +1,6 @@
 //! `arf record` - persist a single ARF record keyed to a commit SHA.
 
-use crate::record::ArfRecord;
+use crate::record::{ArfRecord, FileRef};
 use anyhow::{anyhow, Result};
 use chrono::Utc;
 use std::path::Path;
@@ -12,6 +12,7 @@ pub fn run(
     how: Option<String>,
     backup: Option<String>,
     commit: Option<String>,
+    files: Vec<String>,
 ) -> Result<()> {
     // Check if arf is initialized
     if !Path::new(".arf").exists() {
@@ -32,6 +33,14 @@ pub fn run(
 
     let short_sha = &commit_sha[..8.min(commit_sha.len())];
 
+    // Parse --file values into structured FileRefs. Any parse error
+    // aborts the whole record - we'd rather fail loud than silently
+    // drop file annotations the user asked for.
+    let parsed_files: Vec<FileRef> = files
+        .iter()
+        .map(|s| FileRef::parse(s).map_err(|e| anyhow!("--file {:?}: {}", s, e)))
+        .collect::<Result<Vec<_>>>()?;
+
     let record = ArfRecord {
         what,
         why,
@@ -41,6 +50,11 @@ pub fn run(
         timestamp: Utc::now().to_rfc3339(),
         commit: Some(commit_sha.clone()),
         agent: std::env::var("ARF_AGENT").ok(),
+        files: if parsed_files.is_empty() {
+            None
+        } else {
+            Some(parsed_files)
+        },
     };
 
     let record_dir = format!(".arf/records/{}", short_sha);
