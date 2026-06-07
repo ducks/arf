@@ -1,5 +1,5 @@
 [package]
-name = "arf"
+name = "arf-cli"
 version = "20260607.0.0"
 edition = "2021"
 authors = ["Jake Goldsborough <github@pancakes.email>"]
