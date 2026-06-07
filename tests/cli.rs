@@ -77,6 +77,33 @@ fn init_errors_outside_git_repo() {
 }
 
 #[test]
+fn init_attaches_to_existing_local_branch_without_worktree() {
+    // Set up: arf init creates the branch + worktree, then we remove
+    // just the worktree (simulating a fresh clone or a prior cleanup
+    // where the local branch survived but .arf/ didn't).
+    let dir = git_repo();
+    arf(&dir).args(["init"]).assert().success();
+
+    std::process::Command::new("git")
+        .args(["worktree", "remove", ".arf", "--force"])
+        .current_dir(dir.path())
+        .output()
+        .unwrap();
+
+    // The local arf branch still exists; .arf/ doesn't.
+    assert!(!dir.path().join(".arf").exists());
+
+    // arf init should mount the existing branch rather than failing
+    // or trying to re-create it.
+    arf(&dir)
+        .args(["init"])
+        .assert()
+        .success()
+        .stdout(str::contains("Mounted existing"));
+    dir.child(".arf").assert(predicates::path::is_dir());
+}
+
+#[test]
 fn init_is_idempotent() {
     let dir = git_repo();
     arf(&dir).args(["init"]).assert().success();
