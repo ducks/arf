@@ -1,8 +1,15 @@
 [package]
 name = "arf"
-version = "0.1.0"
+version = "20260607.0.0"
 edition = "2021"
-description = "Agent Reasoning Format - track AI reasoning alongside git"
+authors = ["Jake Goldsborough <github@pancakes.email>"]
+description = "Agent Reasoning Format - track AI reasoning alongside git so reviewers see what the agent thought, not just what it changed."
+license = "MIT"
+repository = "https://github.com/ducks/arf"
+homepage = "https://github.com/ducks/arf"
+readme = "README.md"
+keywords = ["ai", "agent", "git", "reasoning", "cli"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "arf"
