@@ -44,6 +44,13 @@ enum Commands {
         /// Link to specific commit (defaults to HEAD)
         #[arg(short, long)]
         commit: Option<String>,
+
+        /// File(s) this record is about. Repeatable. Each value is
+        /// `path[:start[-end]]` (e.g. `src/main.rs`,
+        /// `src/main.rs:42`, or `src/main.rs:42-76`). Powers the
+        /// `arf why <file>:<line>` lookup.
+        #[arg(long = "file")]
+        files: Vec<String>,
     },
 
     /// Show reasoning records
@@ -89,6 +96,15 @@ enum Commands {
     /// Interactive TUI browser
     Browse,
 
+    /// Show reasoning for a specific file:line, the way `git blame`
+    /// answers "who wrote this" but for "why does this exist."
+    /// Resolves the line back to a commit via git blame, then prints
+    /// matching ARF records.
+    Why {
+        /// `<file>:<line>` target (e.g. `src/main.rs:42`).
+        target: String,
+    },
+
     /// Dump records to stdout for piping into other tooling
     Export {
         /// Only export records linked to this commit
@@ -133,12 +149,14 @@ fn main() -> Result<()> {
             how,
             backup,
             commit,
-        } => commands::record::run(what, why, how, backup, commit)?,
+            files,
+        } => commands::record::run(what, why, how, backup, commit, files)?,
         Commands::Log { commit, limit } => commands::log::run(commit, limit)?,
         Commands::Sync { push, pull } => commands::sync::run(push, pull)?,
         Commands::Graph { limit } => commands::graph::run(limit)?,
         Commands::Diff { commit, full } => commands::diff::run(commit, full)?,
         Commands::Browse => commands::browse::run()?,
+        Commands::Why { target } => commands::why::run(target)?,
         Commands::Export {
             commit,
             since,
