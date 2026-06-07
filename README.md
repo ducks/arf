@@ -22,6 +22,15 @@ how = "Use parameterized queries in register_user()"
 backup = "Revert if tests fail"
 ```
 
+## Install
+
+```bash
+cargo install arf-cli
+```
+
+The crate publishes as `arf-cli` (the bare `arf` name was already
+taken on crates.io); the installed binary is still called `arf`.
+
 ## CLI
 
 ```bash
