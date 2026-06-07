@@ -1,6 +1,6 @@
 [package]
 name = "arf-cli"
-version = "20260607.0.1"
+version = "20260607.0.2"
 edition = "2021"
 authors = ["Jake Goldsborough <github@pancakes.email>"]
 description = "Agent Reasoning Format - track AI reasoning alongside git so reviewers see what the agent thought, not just what it changed."
