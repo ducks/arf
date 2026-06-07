@@ -40,19 +40,31 @@ version-bump:
 	@echo "Updating Cargo.lock..."
 	@cargo check --quiet 2>/dev/null || true
 	@git add Cargo.toml Cargo.lock
-	@git commit -m "chore: bump version to $(VERSION)"
+	@if git diff --cached --quiet; then \
+		echo "Version already at $(VERSION); nothing to bump."; \
+	else \
+		git commit -m "chore: bump version to $(VERSION)"; \
+		echo "Version bumped to $(VERSION)"; \
+		echo "Commit created"; \
+	fi
 	@echo ""
-	@echo "Created branch release/v$(VERSION)"
-	@echo "Version bumped to $(VERSION)"
-	@echo "Commit created"
+	@echo "On branch release/v$(VERSION)"
 
 # Merge to main, tag, push, and publish to crates.io
 release: version-bump
 	@echo "Merging into main..."
 	@git checkout main
-	@git merge --no-ff release/v$(VERSION) -m "Merge branch 'release/v$(VERSION)'"
+	@if git merge-base --is-ancestor release/v$(VERSION) main; then \
+		echo "Release branch already in main; skipping merge."; \
+	else \
+		git merge --no-ff release/v$(VERSION) -m "Merge branch 'release/v$(VERSION)'"; \
+	fi
 	@echo "Creating tag v$(VERSION) on main..."
-	@git tag -a v$(VERSION) -m "Release v$(VERSION)"
+	@if git rev-parse v$(VERSION) >/dev/null 2>&1; then \
+		echo "Tag v$(VERSION) already exists; skipping."; \
+	else \
+		git tag -a v$(VERSION) -m "Release v$(VERSION)"; \
+	fi
 	@echo "Pushing to origin..."
 	@git push origin main
 	@git push origin v$(VERSION)
