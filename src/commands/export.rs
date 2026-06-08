@@ -1,29 +1,38 @@
 //! `arf export` - machine-shaped output for downstream consumers.
 //!
-//! Selection mirrors `log` (--commit, optional --since), but the
-//! output format is JSON / JSONL / TOML rather than human-readable.
-//!
-//! --since accepts either a bare date ("2026-06-01") or a full
-//! RFC-3339 timestamp. Bare dates widen to start-of-day UTC so users
-//! don't have to remember timezone formatting.
+//! Selection mirrors `log` (--commit, optional --since); the output
+//! shape varies by --format. Stream formats (json, jsonl, toml) go
+//! to stdout. The html format produces a directory of files instead
+//! and therefore requires --output <dir>; we validate that combination
+//! up front rather than silently dumping HTML to a terminal.
 
+use crate::commands::html;
 use crate::record::ArfRecord;
 use crate::store::load_records;
 use anyhow::{anyhow, Result};
 use serde::Serialize;
+use std::path::PathBuf;
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
 pub enum ExportFormat {
     Json,
     Jsonl,
     Toml,
+    Html,
 }
 
 pub fn run(
     commit: Option<String>,
     since: Option<String>,
     format: ExportFormat,
+    output: Option<PathBuf>,
 ) -> Result<()> {
+    if matches!(format, ExportFormat::Html) && output.is_none() {
+        return Err(anyhow!(
+            "--format html writes a directory; pass --output <dir>"
+        ));
+    }
+
     let mut records = load_records(commit.as_deref())?;
 
     if let Some(since_str) = since {
@@ -69,6 +78,12 @@ pub fn run(
             };
             let out = toml::to_string_pretty(&wrapper)?;
             print!("{}", out);
+        }
+        ExportFormat::Html => {
+            // --output is required and validated at the top of run().
+            let out_dir = output.unwrap();
+            html::render(&plain, &out_dir)?;
+            println!("Wrote {} record(s) to {}", plain.len(), out_dir.display());
         }
     }
 
