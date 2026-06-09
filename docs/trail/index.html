@@ -1,0 +1,3349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARF trail</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site">
+    <h1><a href="../">ARF</a> trail</h1>
+    <p class="lede">22 reasoning records across 14 commits. Generated 2026-06-09T17:28:44.651043873+00:00.</p>
+  </header>
+
+  <main>
+  
+    <article class="commit" id="commit-08e1678482a552351ef00bf3e0cbdbdc48eabd69">
+      <header class="commit-header">
+        <span class="sha">08e16784</span>
+        <span class="commit-message">Add TUI browser with ratatui</span>
+        <span class="timestamp">2026-02-02T15:37:35-08:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add TUI browser</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Interactive exploration of git+arf history</span></div>
+              <div class="field"><span class="label">How</span><span class="value">ratatui with commit list, reasoning panel, toggleable diff</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-02-02T23:37:42.497261140+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/Cargo.lock b/Cargo.lock
+index 73b5786..26c46b2 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+<span class="hunk">@@ -2,6 +2,12 @@</span>
+ # It is not intended for manual editing.
+ version = 4
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;allocator-api2&quot;</span>
+<span class="add">+version = &quot;0.2.21&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;android_system_properties&quot;
+ version = &quot;0.1.5&quot;
+<span class="hunk">@@ -47,7 +53,7 @@ version = &quot;1.1.5&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc&quot;
+ dependencies = [
+<span class="del">- &quot;windows-sys&quot;,</span>
+<span class="add">+ &quot;windows-sys 0.61.2&quot;,</span>
+ ]
+ 
+ [[package]]
+<span class="hunk">@@ -58,7 +64,7 @@ checksum = &quot;291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d&quot;</span>
+ dependencies = [
+  &quot;anstyle&quot;,
+  &quot;once_cell_polyfill&quot;,
+<span class="del">- &quot;windows-sys&quot;,</span>
+<span class="add">+ &quot;windows-sys 0.61.2&quot;,</span>
+ ]
+ 
+ [[package]]
+<span class="hunk">@@ -74,6 +80,8 @@ dependencies = [</span>
+  &quot;anyhow&quot;,
+  &quot;chrono&quot;,
+  &quot;clap&quot;,
+<span class="add">+ &quot;crossterm&quot;,</span>
+<span class="add">+ &quot;ratatui&quot;,</span>
+  &quot;serde&quot;,
+  &quot;toml&quot;,
+ ]
+<span class="hunk">@@ -84,12 +92,33 @@ version = &quot;1.5.0&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;bitflags&quot;</span>
+<span class="add">+version = &quot;2.10.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;812e12b5285cc515a9c72a5c1d3b6d46a19dac5acfef5265968c166106e31dd3&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;bumpalo&quot;
+ version = &quot;3.19.1&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;5dd9dc738b7a8311c7ade152424974d8115f2cdad61e8dab8dac9f2362298510&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;cassowary&quot;</span>
+<span class="add">+version = &quot;0.3.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;df8670b8c7b9dae1793364eafadf7239c40d669904660c5960d74cfd80b46a53&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;castaway&quot;</span>
+<span class="add">+version = &quot;0.2.4&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;dec551ab6e7578819132c713a93c022a05d60159dc86e7a7050223577484c55a&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;rustversion&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;cc&quot;
+ version = &quot;1.2.55&quot;
+<span class="hunk">@@ -166,24 +195,130 @@ version = &quot;1.0.4&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;compact_str&quot;</span>
+<span class="add">+version = &quot;0.8.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;3b79c4069c6cad78e2e0cdfcbd26275770669fb39fd308a752dc110e83b9af32&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;castaway&quot;,</span>
+<span class="add">+ &quot;cfg-if&quot;,</span>
+<span class="add">+ &quot;itoa&quot;,</span>
+<span class="add">+ &quot;rustversion&quot;,</span>
+<span class="add">+ &quot;ryu&quot;,</span>
+<span class="add">+ &quot;static_assertions&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;core-foundation-sys&quot;
+ version = &quot;0.8.7&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;crossterm&quot;</span>
+<span class="add">+version = &quot;0.28.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;829d955a0bb380ef178a640b91779e3987da38c9aea133b20614cfed8cdea9c6&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;bitflags&quot;,</span>
+<span class="add">+ &quot;crossterm_winapi&quot;,</span>
+<span class="add">+ &quot;mio&quot;,</span>
+<span class="add">+ &quot;parking_lot&quot;,</span>
+<span class="add">+ &quot;rustix&quot;,</span>
+<span class="add">+ &quot;signal-hook&quot;,</span>
+<span class="add">+ &quot;signal-hook-mio&quot;,</span>
+<span class="add">+ &quot;winapi&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;crossterm_winapi&quot;</span>
+<span class="add">+version = &quot;0.9.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;acdd7c62a3665c7f6830a51635d9ac9b23ed385797f70a83bb8bafe9c572ab2b&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;winapi&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;darling&quot;</span>
+<span class="add">+version = &quot;0.23.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;25ae13da2f202d56bd7f91c25fba009e7717a1e4a1cc98a76d844b65ae912e9d&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;darling_core&quot;,</span>
+<span class="add">+ &quot;darling_macro&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;darling_core&quot;</span>
+<span class="add">+version = &quot;0.23.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9865a50f7c335f53564bb694ef660825eb8610e0a53d3e11bf1b0d3df31e03b0&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;ident_case&quot;,</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;strsim&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;darling_macro&quot;</span>
+<span class="add">+version = &quot;0.23.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;ac3984ec7bd6cfa798e62b4a642426a5be0e68f9401cfc2a01e3fa9ea2fcdb8d&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;darling_core&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;either&quot;</span>
+<span class="add">+version = &quot;1.15.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;equivalent&quot;
+ version = &quot;1.0.2&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;errno&quot;</span>
+<span class="add">+version = &quot;0.3.14&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;windows-sys 0.61.2&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;find-msvc-tools&quot;
+ version = &quot;0.1.9&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;foldhash&quot;</span>
+<span class="add">+version = &quot;0.1.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;hashbrown&quot;</span>
+<span class="add">+version = &quot;0.15.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;allocator-api2&quot;,</span>
+<span class="add">+ &quot;equivalent&quot;,</span>
+<span class="add">+ &quot;foldhash&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;hashbrown&quot;
+ version = &quot;0.16.1&quot;
+<span class="hunk">@@ -220,6 +355,12 @@ dependencies = [</span>
+  &quot;cc&quot;,
+ ]
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;ident_case&quot;</span>
+<span class="add">+version = &quot;1.0.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;indexmap&quot;
+ version = &quot;2.13.0&quot;
+<span class="hunk">@@ -227,7 +368,29 @@ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+ checksum = &quot;7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017&quot;
+ dependencies = [
+  &quot;equivalent&quot;,
+<span class="del">- &quot;hashbrown&quot;,</span>
+<span class="add">+ &quot;hashbrown 0.16.1&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;indoc&quot;</span>
+<span class="add">+version = &quot;2.0.7&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;79cf5c93f93228cf8efb3ba362535fb11199ac548a09ce117c9b1adc3030d706&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;rustversion&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;instability&quot;</span>
+<span class="add">+version = &quot;0.3.11&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;357b7205c6cd18dd2c86ed312d1e70add149aea98e7ef72b9fdf0270e555c11d&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;darling&quot;,</span>
+<span class="add">+ &quot;indoc&quot;,</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+ ]
+ 
+ [[package]]
+<span class="hunk">@@ -236,6 +399,21 @@ version = &quot;1.70.2&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;itertools&quot;</span>
+<span class="add">+version = &quot;0.13.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;either&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;itoa&quot;</span>
+<span class="add">+version = &quot;1.0.17&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;js-sys&quot;
+ version = &quot;0.3.85&quot;
+<span class="hunk">@@ -252,18 +430,54 @@ version = &quot;0.2.180&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;bcc35a38544a891a5f7c865aca548a982ccb3b8650a5b06d0fd33a10283c56fc&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;linux-raw-sys&quot;</span>
+<span class="add">+version = &quot;0.4.15&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;d26c52dbd32dccf2d10cac7725f8eae5296885fb5703b261f7d0a0739ec807ab&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;lock_api&quot;</span>
+<span class="add">+version = &quot;0.4.14&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;224399e74b87b5f3557511d98dff8b14089b3dadafcab6bb93eab67d3aace965&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;scopeguard&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;log&quot;
+ version = &quot;0.4.29&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;lru&quot;</span>
+<span class="add">+version = &quot;0.12.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;234cf4f4a04dc1f57e24b96cc0cd600cf2af460d4161ac5ecdd0af8e1f3b2a38&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;hashbrown 0.15.5&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;memchr&quot;
+ version = &quot;2.7.6&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;mio&quot;</span>
+<span class="add">+version = &quot;1.1.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a69bcab0ad47271a0234d9422b131806bf3968021e5dc9328caf2d4cd58557fc&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;log&quot;,</span>
+<span class="add">+ &quot;wasi&quot;,</span>
+<span class="add">+ &quot;windows-sys 0.61.2&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;num-traits&quot;
+ version = &quot;0.2.19&quot;
+<span class="hunk">@@ -285,6 +499,35 @@ version = &quot;1.70.2&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;parking_lot&quot;</span>
+<span class="add">+version = &quot;0.12.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;93857453250e3077bd71ff98b6a65ea6621a19bb0f559a85248955ac12c45a1a&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;lock_api&quot;,</span>
+<span class="add">+ &quot;parking_lot_core&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;parking_lot_core&quot;</span>
+<span class="add">+version = &quot;0.9.12&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;2621685985a2ebf1c516881c026032ac7deafcda1a2c9b7850dc81e3dfcb64c1&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;cfg-if&quot;,</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;redox_syscall&quot;,</span>
+<span class="add">+ &quot;smallvec&quot;,</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;paste&quot;</span>
+<span class="add">+version = &quot;1.0.15&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;proc-macro2&quot;
+ version = &quot;1.0.106&quot;
+<span class="hunk">@@ -303,12 +546,67 @@ dependencies = [</span>
+  &quot;proc-macro2&quot;,
+ ]
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;ratatui&quot;</span>
+<span class="add">+version = &quot;0.29.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;eabd94c2f37801c20583fc49dd5cd6b0ba68c716787c2dd6ed18571e1e63117b&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;bitflags&quot;,</span>
+<span class="add">+ &quot;cassowary&quot;,</span>
+<span class="add">+ &quot;compact_str&quot;,</span>
+<span class="add">+ &quot;crossterm&quot;,</span>
+<span class="add">+ &quot;indoc&quot;,</span>
+<span class="add">+ &quot;instability&quot;,</span>
+<span class="add">+ &quot;itertools&quot;,</span>
+<span class="add">+ &quot;lru&quot;,</span>
+<span class="add">+ &quot;paste&quot;,</span>
+<span class="add">+ &quot;strum&quot;,</span>
+<span class="add">+ &quot;unicode-segmentation&quot;,</span>
+<span class="add">+ &quot;unicode-truncate&quot;,</span>
+<span class="add">+ &quot;unicode-width 0.2.0&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;redox_syscall&quot;</span>
+<span class="add">+version = &quot;0.5.18&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;ed2bf2547551a7053d6fdfafda3f938979645c44812fbfcda098faae3f1a362d&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;bitflags&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;rustix&quot;</span>
+<span class="add">+version = &quot;0.38.44&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;bitflags&quot;,</span>
+<span class="add">+ &quot;errno&quot;,</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;linux-raw-sys&quot;,</span>
+<span class="add">+ &quot;windows-sys 0.59.0&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;rustversion&quot;
+ version = &quot;1.0.22&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;ryu&quot;</span>
+<span class="add">+version = &quot;1.0.22&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a50f4cf475b65d88e057964e0e9bb1f0aa9bbb2036dc65c64596b42932536984&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;scopeguard&quot;</span>
+<span class="add">+version = &quot;1.2.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;serde&quot;
+ version = &quot;1.0.228&quot;
+<span class="hunk">@@ -354,12 +652,77 @@ version = &quot;1.3.0&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;signal-hook&quot;</span>
+<span class="add">+version = &quot;0.3.18&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;d881a16cf4426aa584979d30bd82cb33429027e42122b169753d6ef1085ed6e2&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;signal-hook-registry&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;signal-hook-mio&quot;</span>
+<span class="add">+version = &quot;0.2.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b75a19a7a740b25bc7944bdee6172368f988763b744e3d4dfe753f6b4ece40cc&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+ &quot;mio&quot;,</span>
+<span class="add">+ &quot;signal-hook&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;signal-hook-registry&quot;</span>
+<span class="add">+version = &quot;1.4.8&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;errno&quot;,</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;smallvec&quot;</span>
+<span class="add">+version = &quot;1.15.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;static_assertions&quot;</span>
+<span class="add">+version = &quot;1.1.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;strsim&quot;
+ version = &quot;0.11.1&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;strum&quot;</span>
+<span class="add">+version = &quot;0.26.3&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;8fec0f0aef304996cf250b31b5a10dee7980c85da9d759361292b8bca5a18f06&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;strum_macros&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;strum_macros&quot;</span>
+<span class="add">+version = &quot;0.26.4&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;4c6bee85a5a24955dc440386795aa378cd9cf82acd5f764469152d2270e581be&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;heck&quot;,</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;rustversion&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;syn&quot;
+ version = &quot;2.0.114&quot;
+<span class="hunk">@@ -418,12 +781,47 @@ version = &quot;1.0.22&quot;</span>
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;unicode-segmentation&quot;</span>
+<span class="add">+version = &quot;1.12.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;unicode-truncate&quot;</span>
+<span class="add">+version = &quot;1.1.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b3644627a5af5fa321c95b9b235a72fd24cd29c648c2c379431e6628655627bf&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;itertools&quot;,</span>
+<span class="add">+ &quot;unicode-segmentation&quot;,</span>
+<span class="add">+ &quot;unicode-width 0.1.14&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;unicode-width&quot;</span>
+<span class="add">+version = &quot;0.1.14&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;unicode-width&quot;</span>
+<span class="add">+version = &quot;0.2.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;1fc81956842c57dac11422a97c3b8195a1ff727f06e85c84ed2e8aa277c9a0fd&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;utf8parse&quot;
+ version = &quot;0.2.2&quot;
+ source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;
+ checksum = &quot;06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821&quot;
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;wasi&quot;</span>
+<span class="add">+version = &quot;0.11.1+wasi-snapshot-preview1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;wasm-bindgen&quot;
+ version = &quot;0.2.108&quot;
+<span class="hunk">@@ -469,6 +867,28 @@ dependencies = [</span>
+  &quot;unicode-ident&quot;,
+ ]
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;winapi&quot;</span>
+<span class="add">+version = &quot;0.3.9&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5c839a674fcd7a98952e593242ea400abe93992746761e38641405d28b00f419&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;winapi-i686-pc-windows-gnu&quot;,</span>
+<span class="add">+ &quot;winapi-x86_64-pc-windows-gnu&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;winapi-i686-pc-windows-gnu&quot;</span>
+<span class="add">+version = &quot;0.4.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;winapi-x86_64-pc-windows-gnu&quot;</span>
+<span class="add">+version = &quot;0.4.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;windows-core&quot;
+ version = &quot;0.62.2&quot;
+<span class="hunk">@@ -528,6 +948,15 @@ dependencies = [</span>
+  &quot;windows-link&quot;,
+ ]
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-sys&quot;</span>
+<span class="add">+version = &quot;0.59.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-targets&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;windows-sys&quot;
+ version = &quot;0.61.2&quot;
+<span class="hunk">@@ -537,6 +966,70 @@ dependencies = [</span>
+  &quot;windows-link&quot;,
+ ]
+ 
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-targets&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows_aarch64_gnullvm&quot;,</span>
+<span class="add">+ &quot;windows_aarch64_msvc&quot;,</span>
+<span class="add">+ &quot;windows_i686_gnu&quot;,</span>
+<span class="add">+ &quot;windows_i686_gnullvm&quot;,</span>
+<span class="add">+ &quot;windows_i686_msvc&quot;,</span>
+<span class="add">+ &quot;windows_x86_64_gnu&quot;,</span>
+<span class="add">+ &quot;windows_x86_64_gnullvm&quot;,</span>
+<span class="add">+ &quot;windows_x86_64_msvc&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_aarch64_gnullvm&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_aarch64_msvc&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_i686_gnu&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_i686_gnullvm&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_i686_msvc&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_x86_64_gnu&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_x86_64_gnullvm&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows_x86_64_msvc&quot;</span>
+<span class="add">+version = &quot;0.52.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec&quot;</span>
+<span class="add">+</span>
+ [[package]]
+ name = &quot;winnow&quot;
+ version = &quot;0.7.14&quot;
+diff --git a/Cargo.toml b/Cargo.toml
+index 338813c..d01b5c3 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+<span class="hunk">@@ -14,3 +14,5 @@ anyhow = &quot;1&quot;</span>
+ chrono = { version = &quot;0.4&quot;, features = [&quot;serde&quot;] }
+ serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
+ toml = &quot;0.8&quot;
+<span class="add">+ratatui = &quot;0.29&quot;</span>
+<span class="add">+crossterm = &quot;0.28&quot;</span>
+diff --git a/shell.nix b/shell.nix
+index ad15de5..5a88be6 100644
+--- a/shell.nix
++++ b/shell.nix
+<span class="hunk">@@ -1,12 +1,20 @@</span>
+ { pkgs ? import &lt;nixpkgs&gt; {} }:
+ 
+<span class="del">-pkgs.mkShell {</span>
+<span class="del">-  buildInputs = with pkgs; [</span>
+<span class="del">-    rustc</span>
+<span class="del">-    cargo</span>
+<span class="add">+let</span>
+<span class="add">+  rust-overlay = import (pkgs.fetchFromGitHub {</span>
+<span class="add">+    owner = &quot;oxalica&quot;;</span>
+<span class="add">+    repo = &quot;rust-overlay&quot;;</span>
+<span class="add">+    rev = &quot;5018343419ea808f8a413241381976b7e60951f2&quot;;</span>
+<span class="add">+    sha256 = &quot;19x56dqzplps4skxmqr2wdv03iyw9921gvjrlw1nqxfzh9w96334&quot;;</span>
+<span class="add">+  });</span>
+<span class="add">+  pkgsWithRust = import &lt;nixpkgs&gt; {</span>
+<span class="add">+    overlays = [ rust-overlay ];</span>
+<span class="add">+  };</span>
+<span class="add">+in</span>
+<span class="add">+pkgsWithRust.mkShell {</span>
+<span class="add">+  buildInputs = with pkgsWithRust; [</span>
+<span class="add">+    rust-bin.stable.latest.default</span>
+     rust-analyzer
+<span class="del">-    clippy</span>
+<span class="del">-    rustfmt</span>
+   ];
+ 
+   shellHook = &#39;&#39;
+<span class="hunk">@@ -15,10 +23,5 @@ pkgs.mkShell {</span>
+     echo &quot;===========================&quot;
+     echo &quot;Rust: $(rustc --version)&quot;
+     echo &quot;&quot;
+<span class="del">-    echo &quot;Commands:&quot;</span>
+<span class="del">-    echo &quot;  cargo build    - Build arf&quot;</span>
+<span class="del">-    echo &quot;  cargo run      - Run arf&quot;</span>
+<span class="del">-    echo &quot;  cargo test     - Run tests&quot;</span>
+<span class="del">-    echo &quot;&quot;</span>
+   &#39;&#39;;
+ }
+diff --git a/src/main.rs b/src/main.rs
+index 21a18e6..3560afb 100644
+--- a/src/main.rs
++++ b/src/main.rs
+<span class="hunk">@@ -1,7 +1,17 @@</span>
+ use anyhow::{anyhow, Result};
+ use chrono::Utc;
+ use clap::{Parser, Subcommand};
+<span class="add">+use crossterm::{</span>
+<span class="add">+    event::{self, Event, KeyCode, KeyEventKind},</span>
+<span class="add">+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},</span>
+<span class="add">+    ExecutableCommand,</span>
+<span class="add">+};</span>
+<span class="add">+use ratatui::{</span>
+<span class="add">+    prelude::*,</span>
+<span class="add">+    widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Wrap},</span>
+<span class="add">+};</span>
+ use serde::{Deserialize, Serialize};
+<span class="add">+use std::io::stdout;</span>
+ use std::path::Path;
+ use std::process::Command;
+ 
+<span class="hunk">@@ -82,6 +92,9 @@ enum Commands {</span>
+         #[arg(long)]
+         full: bool,
+     },
+<span class="add">+</span>
+<span class="add">+    /// Interactive TUI browser</span>
+<span class="add">+    Browse,</span>
+ }
+ 
+ #[derive(Debug, Serialize, Deserialize)]
+<span class="hunk">@@ -117,6 +130,7 @@ fn main() -&gt; Result&lt;()&gt; {</span>
+         Commands::Sync { push, pull } =&gt; cmd_sync(push, pull)?,
+         Commands::Graph { limit } =&gt; cmd_graph(limit)?,
+         Commands::Diff { commit, full } =&gt; cmd_diff(commit, full)?,
+<span class="add">+        Commands::Browse =&gt; cmd_browse()?,</span>
+     }
+ 
+     Ok(())
+<span class="hunk">@@ -622,3 +636,322 @@ fn cmd_diff(commit: Option&lt;String&gt;, full: bool) -&gt; Result&lt;()&gt; {</span>
+ 
+     Ok(())
+ }
+<span class="add">+</span>
+<span class="add">+// TUI types and implementation</span>
+<span class="add">+</span>
+<span class="add">+#[derive(Debug)]</span>
+<span class="add">+struct CommitInfo {</span>
+<span class="add">+    sha: String,</span>
+<span class="add">+    short_sha: String,</span>
+<span class="add">+    message: String,</span>
+<span class="add">+    records: Vec&lt;ArfRecord&gt;,</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+#[derive(Debug, Clone, Copy, PartialEq)]</span>
+<span class="add">+enum DiffMode {</span>
+<span class="add">+    Hidden,</span>
+<span class="add">+    Stat,</span>
+<span class="add">+    Full,</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+struct App {</span>
+<span class="add">+    commits: Vec&lt;CommitInfo&gt;,</span>
+<span class="add">+    list_state: ListState,</span>
+<span class="add">+    diff_mode: DiffMode,</span>
+<span class="add">+    diff_content: String,</span>
+<span class="add">+    should_quit: bool,</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+impl App {</span>
+<span class="add">+    fn new(commits: Vec&lt;CommitInfo&gt;) -&gt; Self {</span>
+<span class="add">+        let mut list_state = ListState::default();</span>
+<span class="add">+        if !commits.is_empty() {</span>
+<span class="add">+            list_state.select(Some(0));</span>
+<span class="add">+        }</span>
+<span class="add">+        Self {</span>
+<span class="add">+            commits,</span>
+<span class="add">+            list_state,</span>
+<span class="add">+            diff_mode: DiffMode::Stat,</span>
+<span class="add">+            diff_content: String::new(),</span>
+<span class="add">+            should_quit: false,</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    fn selected_commit(&amp;self) -&gt; Option&lt;&amp;CommitInfo&gt; {</span>
+<span class="add">+        self.list_state.selected().and_then(|i| self.commits.get(i))</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    fn next(&amp;mut self) {</span>
+<span class="add">+        if self.commits.is_empty() {</span>
+<span class="add">+            return;</span>
+<span class="add">+        }</span>
+<span class="add">+        let i = match self.list_state.selected() {</span>
+<span class="add">+            Some(i) =&gt; (i + 1) % self.commits.len(),</span>
+<span class="add">+            None =&gt; 0,</span>
+<span class="add">+        };</span>
+<span class="add">+        self.list_state.select(Some(i));</span>
+<span class="add">+        self.update_diff();</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    fn previous(&amp;mut self) {</span>
+<span class="add">+        if self.commits.is_empty() {</span>
+<span class="add">+            return;</span>
+<span class="add">+        }</span>
+<span class="add">+        let i = match self.list_state.selected() {</span>
+<span class="add">+            Some(i) =&gt; {</span>
+<span class="add">+                if i == 0 {</span>
+<span class="add">+                    self.commits.len() - 1</span>
+<span class="add">+                } else {</span>
+<span class="add">+                    i - 1</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+            None =&gt; 0,</span>
+<span class="add">+        };</span>
+<span class="add">+        self.list_state.select(Some(i));</span>
+<span class="add">+        self.update_diff();</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    fn toggle_diff(&amp;mut self) {</span>
+<span class="add">+        self.diff_mode = match self.diff_mode {</span>
+<span class="add">+            DiffMode::Hidden =&gt; DiffMode::Stat,</span>
+<span class="add">+            DiffMode::Stat =&gt; DiffMode::Full,</span>
+<span class="add">+            DiffMode::Full =&gt; DiffMode::Hidden,</span>
+<span class="add">+        };</span>
+<span class="add">+        self.update_diff();</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    fn update_diff(&amp;mut self) {</span>
+<span class="add">+        if self.diff_mode == DiffMode::Hidden {</span>
+<span class="add">+            self.diff_content.clear();</span>
+<span class="add">+            return;</span>
+<span class="add">+        }</span>
+<span class="add">+</span>
+<span class="add">+        let Some(commit) = self.selected_commit() else {</span>
+<span class="add">+            self.diff_content.clear();</span>
+<span class="add">+            return;</span>
+<span class="add">+        };</span>
+<span class="add">+</span>
+<span class="add">+        let args = if self.diff_mode == DiffMode::Full {</span>
+<span class="add">+            vec![&quot;show&quot;, &quot;--format=&quot;, &amp;commit.sha]</span>
+<span class="add">+        } else {</span>
+<span class="add">+            vec![&quot;show&quot;, &quot;--stat&quot;, &quot;--format=&quot;, &amp;commit.sha]</span>
+<span class="add">+        };</span>
+<span class="add">+</span>
+<span class="add">+        let output = Command::new(&quot;git&quot;).args(&amp;args).output();</span>
+<span class="add">+        self.diff_content = match output {</span>
+<span class="add">+            Ok(o) if o.status.success() =&gt; String::from_utf8_lossy(&amp;o.stdout).to_string(),</span>
+<span class="add">+            _ =&gt; &quot;Failed to get diff&quot;.to_string(),</span>
+<span class="add">+        };</span>
+<span class="add">+    }</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn cmd_browse() -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    // Get commits</span>
+<span class="add">+    let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;log&quot;, &quot;--oneline&quot;, &quot;--no-decorate&quot;, &quot;-50&quot;])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !output.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Failed to get git log&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let log = String::from_utf8_lossy(&amp;output.stdout);</span>
+<span class="add">+    let records_dir = Path::new(&quot;.arf/records&quot;);</span>
+<span class="add">+</span>
+<span class="add">+    let mut commits: Vec&lt;CommitInfo&gt; = Vec::new();</span>
+<span class="add">+</span>
+<span class="add">+    for line in log.lines() {</span>
+<span class="add">+        let parts: Vec&lt;&amp;str&gt; = line.splitn(2, &#39; &#39;).collect();</span>
+<span class="add">+        let (sha, msg) = if parts.len() == 2 {</span>
+<span class="add">+            (parts[0], parts[1])</span>
+<span class="add">+        } else {</span>
+<span class="add">+            (parts[0], &quot;&quot;)</span>
+<span class="add">+        };</span>
+<span class="add">+</span>
+<span class="add">+        let short_sha = sha.to_string();</span>
+<span class="add">+</span>
+<span class="add">+        // Get full SHA for diff</span>
+<span class="add">+        let full_sha = Command::new(&quot;git&quot;)</span>
+<span class="add">+            .args([&quot;rev-parse&quot;, sha])</span>
+<span class="add">+            .output()</span>
+<span class="add">+            .ok()</span>
+<span class="add">+            .filter(|o| o.status.success())</span>
+<span class="add">+            .map(|o| String::from_utf8_lossy(&amp;o.stdout).trim().to_string())</span>
+<span class="add">+            .unwrap_or_else(|| sha.to_string());</span>
+<span class="add">+</span>
+<span class="add">+        // Find ARF records</span>
+<span class="add">+        let mut records = Vec::new();</span>
+<span class="add">+        if records_dir.exists() {</span>
+<span class="add">+            if let Ok(entries) = std::fs::read_dir(records_dir) {</span>
+<span class="add">+                for entry in entries.filter_map(|e| e.ok()) {</span>
+<span class="add">+                    let dir_name = entry.file_name().to_string_lossy().to_string();</span>
+<span class="add">+                    if dir_name.starts_with(&amp;short_sha) || short_sha.starts_with(&amp;dir_name) {</span>
+<span class="add">+                        if let Ok(record_entries) = std::fs::read_dir(entry.path()) {</span>
+<span class="add">+                            for record_entry in record_entries.filter_map(|e| e.ok()) {</span>
+<span class="add">+                                let path = record_entry.path();</span>
+<span class="add">+                                if path.extension().map_or(false, |e| e == &quot;toml&quot;) {</span>
+<span class="add">+                                    if let Ok(content) = std::fs::read_to_string(&amp;path) {</span>
+<span class="add">+                                        if let Ok(record) = toml::from_str::&lt;ArfRecord&gt;(&amp;content) {</span>
+<span class="add">+                                            records.push(record);</span>
+<span class="add">+                                        }</span>
+<span class="add">+                                    }</span>
+<span class="add">+                                }</span>
+<span class="add">+                            }</span>
+<span class="add">+                        }</span>
+<span class="add">+                    }</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+        }</span>
+<span class="add">+</span>
+<span class="add">+        commits.push(CommitInfo {</span>
+<span class="add">+            sha: full_sha,</span>
+<span class="add">+            short_sha,</span>
+<span class="add">+            message: msg.to_string(),</span>
+<span class="add">+            records,</span>
+<span class="add">+        });</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    if commits.is_empty() {</span>
+<span class="add">+        println!(&quot;No commits found.&quot;);</span>
+<span class="add">+        return Ok(());</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Setup terminal</span>
+<span class="add">+    enable_raw_mode()?;</span>
+<span class="add">+    stdout().execute(EnterAlternateScreen)?;</span>
+<span class="add">+    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;</span>
+<span class="add">+</span>
+<span class="add">+    let mut app = App::new(commits);</span>
+<span class="add">+    app.update_diff();</span>
+<span class="add">+</span>
+<span class="add">+    // Main loop</span>
+<span class="add">+    loop {</span>
+<span class="add">+        terminal.draw(|frame| ui(frame, &amp;mut app))?;</span>
+<span class="add">+</span>
+<span class="add">+        if let Event::Key(key) = event::read()? {</span>
+<span class="add">+            if key.kind == KeyEventKind::Press {</span>
+<span class="add">+                match key.code {</span>
+<span class="add">+                    KeyCode::Char(&#39;q&#39;) | KeyCode::Esc =&gt; app.should_quit = true,</span>
+<span class="add">+                    KeyCode::Down | KeyCode::Char(&#39;j&#39;) =&gt; app.next(),</span>
+<span class="add">+                    KeyCode::Up | KeyCode::Char(&#39;k&#39;) =&gt; app.previous(),</span>
+<span class="add">+                    KeyCode::Char(&#39;d&#39;) | KeyCode::Tab =&gt; app.toggle_diff(),</span>
+<span class="add">+                    _ =&gt; {}</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+        }</span>
+<span class="add">+</span>
+<span class="add">+        if app.should_quit {</span>
+<span class="add">+            break;</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Restore terminal</span>
+<span class="add">+    disable_raw_mode()?;</span>
+<span class="add">+    stdout().execute(LeaveAlternateScreen)?;</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn ui(frame: &amp;mut Frame, app: &amp;mut App) {</span>
+<span class="add">+    let has_diff = app.diff_mode != DiffMode::Hidden;</span>
+<span class="add">+</span>
+<span class="add">+    // Main layout</span>
+<span class="add">+    let main_chunks = Layout::default()</span>
+<span class="add">+        .direction(Direction::Vertical)</span>
+<span class="add">+        .constraints(if has_diff {</span>
+<span class="add">+            vec![Constraint::Percentage(50), Constraint::Percentage(50)]</span>
+<span class="add">+        } else {</span>
+<span class="add">+            vec![Constraint::Percentage(100)]</span>
+<span class="add">+        })</span>
+<span class="add">+        .split(frame.area());</span>
+<span class="add">+</span>
+<span class="add">+    // Top section: commits + reasoning</span>
+<span class="add">+    let top_chunks = Layout::default()</span>
+<span class="add">+        .direction(Direction::Horizontal)</span>
+<span class="add">+        .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])</span>
+<span class="add">+        .split(main_chunks[0]);</span>
+<span class="add">+</span>
+<span class="add">+    // Commits list</span>
+<span class="add">+    let items: Vec&lt;ListItem&gt; = app</span>
+<span class="add">+        .commits</span>
+<span class="add">+        .iter()</span>
+<span class="add">+        .map(|c| {</span>
+<span class="add">+            let has_arf = if c.records.is_empty() { &quot; &quot; } else { &quot;●&quot; };</span>
+<span class="add">+            ListItem::new(format!(&quot;{} {} {}&quot;, has_arf, c.short_sha, c.message))</span>
+<span class="add">+        })</span>
+<span class="add">+        .collect();</span>
+<span class="add">+</span>
+<span class="add">+    let commits_list = List::new(items)</span>
+<span class="add">+        .block(</span>
+<span class="add">+            Block::default()</span>
+<span class="add">+                .borders(Borders::ALL)</span>
+<span class="add">+                .title(&quot; Commits [j/k to navigate] &quot;),</span>
+<span class="add">+        )</span>
+<span class="add">+        .highlight_style(Style::default().bg(Color::DarkGray).bold())</span>
+<span class="add">+        .highlight_symbol(&quot;→ &quot;);</span>
+<span class="add">+</span>
+<span class="add">+    frame.render_stateful_widget(commits_list, top_chunks[0], &amp;mut app.list_state);</span>
+<span class="add">+</span>
+<span class="add">+    // Reasoning panel</span>
+<span class="add">+    let reasoning_text = if let Some(commit) = app.selected_commit() {</span>
+<span class="add">+        if commit.records.is_empty() {</span>
+<span class="add">+            &quot;(no ARF record for this commit)&quot;.to_string()</span>
+<span class="add">+        } else {</span>
+<span class="add">+            commit</span>
+<span class="add">+                .records</span>
+<span class="add">+                .iter()</span>
+<span class="add">+                .map(|r| {</span>
+<span class="add">+                    let mut s = format!(&quot;what: {}\nwhy:  {}&quot;, r.what, r.why);</span>
+<span class="add">+                    if let Some(ref how) = r.how {</span>
+<span class="add">+                        s.push_str(&amp;format!(&quot;\nhow:  {}&quot;, how));</span>
+<span class="add">+                    }</span>
+<span class="add">+                    if let Some(ref backup) = r.backup {</span>
+<span class="add">+                        s.push_str(&amp;format!(&quot;\nback: {}&quot;, backup));</span>
+<span class="add">+                    }</span>
+<span class="add">+                    s</span>
+<span class="add">+                })</span>
+<span class="add">+                .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+<span class="add">+                .join(&quot;\n\n---\n\n&quot;)</span>
+<span class="add">+        }</span>
+<span class="add">+    } else {</span>
+<span class="add">+        &quot;No commit selected&quot;.to_string()</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    let reasoning = Paragraph::new(reasoning_text)</span>
+<span class="add">+        .block(</span>
+<span class="add">+            Block::default()</span>
+<span class="add">+                .borders(Borders::ALL)</span>
+<span class="add">+                .title(&quot; Reasoning &quot;),</span>
+<span class="add">+        )</span>
+<span class="add">+        .wrap(Wrap { trim: false });</span>
+<span class="add">+</span>
+<span class="add">+    frame.render_widget(reasoning, top_chunks[1]);</span>
+<span class="add">+</span>
+<span class="add">+    // Diff panel (if visible)</span>
+<span class="add">+    if has_diff {</span>
+<span class="add">+        let diff_title = match app.diff_mode {</span>
+<span class="add">+            DiffMode::Stat =&gt; &quot; Diff (stat) [d to toggle] &quot;,</span>
+<span class="add">+            DiffMode::Full =&gt; &quot; Diff (full) [d to toggle] &quot;,</span>
+<span class="add">+            DiffMode::Hidden =&gt; &quot;&quot;,</span>
+<span class="add">+        };</span>
+<span class="add">+</span>
+<span class="add">+        let diff = Paragraph::new(app.diff_content.clone())</span>
+<span class="add">+            .block(Block::default().borders(Borders::ALL).title(diff_title))</span>
+<span class="add">+            .wrap(Wrap { trim: false });</span>
+<span class="add">+</span>
+<span class="add">+        frame.render_widget(diff, main_chunks[1]);</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Help bar at bottom</span>
+<span class="add">+    let help = &quot; q: quit | j/k: navigate | d: toggle diff (hidden/stat/full) &quot;;</span>
+<span class="add">+    let help_area = Rect {</span>
+<span class="add">+        x: 0,</span>
+<span class="add">+        y: frame.area().height - 1,</span>
+<span class="add">+        width: frame.area().width,</span>
+<span class="add">+        height: 1,</span>
+<span class="add">+    };</span>
+<span class="add">+    frame.render_widget(</span>
+<span class="add">+        Paragraph::new(help).style(Style::default().bg(Color::DarkGray)),</span>
+<span class="add">+        help_area,</span>
+<span class="add">+    );</span>
+<span class="add">+}</span>
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+    <article class="commit" id="commit-22e0360688991c6d563fa169dcd59e82c4534339">
+      <header class="commit-header">
+        <span class="sha">22e03606</span>
+        <span class="commit-message">Merge branch &#x27;release&#x2F;v20260607.0.3&#x27;</span>
+        <span class="timestamp">2026-06-07T08:40:26-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Ship arf init&#x27;s branch-detection fix</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Now handles all four states cleanly: both-exist (no-op), branch-only (mount), remote-only (attach), nothing (create). New integration test covers the branch-but-no-worktree case. Remote-attaches case is harder to test in isolation since it requires a real remote, but the code path mirrors the branch-only one.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Four-arm conditional in cmd_init::run replacing the old two-arm version. Removed the early-return on local-branch-exists since it was masking the missing-worktree case. Test removes .arf worktree via git worktree remove --force, then re-runs arf init and asserts the Mounted existing message + that .arf is a dir again.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:30:56.184721566+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Make &#x27;arf init&#x27; detect an existing remote arf branch and attach a worktree to it instead of refusing</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Real bug surfaced during the day-with-arf session. A fresh clone of a repo that already has an &#x27;arf&#x27; branch (e.g. from a prior teammate&#x27;s work) has no local worktree at .arf&#x2F;, so arf record fails with &#x27;ARF not initialized&#x27;. arf init&#x27;s current logic only handles the local-branch-exists case; it should also handle the remote-branch-exists case by creating the worktree off the existing branch.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">After the &#x27;is git repo&#x27; check and before the &#x27;create orphan&#x27; path, check &#x27;git rev-parse --verify origin&#x2F;ARF_BRANCH&#x27;. If it succeeds, run &#x27;git worktree add .arf ARF_BRANCH&#x27; which creates a local tracking branch from the remote and mounts it. Add an integration test that creates a repo with an existing arf branch, runs init in a fresh clone, and asserts the worktree is set up.</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">If the worktree-add fails for some reason (already exists, conflicting branch name), surface the git error - don&#x27;t try to recover. User can git worktree remove and retry.</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:29:20.330253958+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-4374a88d9cb7925c1d306743698d801e137926da">
+      <header class="commit-header">
+        <span class="sha">4374a88d</span>
+        <span class="commit-message">Merge branch &#x27;feat&#x2F;export-command&#x27;</span>
+        <span class="timestamp">2026-06-07T08:10:41-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Implement integration test suite for the arf CLI</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">13 tests covering init (3), record (2), log (2), export (6). Suite runs in 110ms via assert_cmd. Caught a latent record-overwriting bug on first run - multiple records emitted within the same second collided because the filename used second-resolution timestamps. Fixed by switching to nanosecond resolution.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">tests&#x2F;cli.rs with shared git_repo() &#x2F; arf_repo() fixtures. Each test gets its own tempdir via assert_fs. Assertions parse stdout as JSON or read filesystem layout depending on what the command produces. assert_cmd::Command::cargo_bin(&#x27;arf&#x27;) resolves to the built test binary so no PATH manipulation needed.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:17:49.442564967+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add integration tests for the arf CLI covering init, record, log, and export</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Right now every change requires manual testing - running commands, eyeballing JSON, hoping nothing regressed. With nine subcommands and a serialization layer, that scales badly. Real tests let us trust make release. The CLI shape is stable enough to bake assumptions into tests without rewriting them every refactor.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Use the assert_cmd + tempfile + assert_fs trio (the standard Rust CLI testing combo). One tests&#x2F;cli.rs file with a shared &#x27;arf_repo()&#x27; fixture helper that initializes a git repo + arf in a tempdir and returns handles. Each test gets its own tempdir. Assertions on stdout for export tests, on filesystem layout for record&#x2F;init tests.</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">If assert_cmd&#x27;s exec-the-real-binary model is too slow for the test count, fall back to invoking main() in-process via a public API entry point. Unlikely to matter at this scale.</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:14:09.894406280+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-5604413">
+      <header class="commit-header">
+        <span class="sha">5604413</span>
+        <span class="commit-message">Add graph command for unified git+arf visualization</span>
+        <span class="timestamp">2026-02-02T15:18:21-08:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add graph command</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">User requested visualization combining git commits with ARF reasoning records</span></div>
+              <div class="field"><span class="label">How</span><span class="value">New cmd_graph function matches commit SHAs to .arf&#x2F;records&#x2F; directories, renders tree-style output</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-02-02T23:18:53.502624847+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/src/main.rs b/src/main.rs
+index 157a540..1d8fa7c 100644
+--- a/src/main.rs
++++ b/src/main.rs
+<span class="hunk">@@ -64,6 +64,13 @@ enum Commands {</span>
+         #[arg(long)]
+         pull: bool,
+     },
+<span class="add">+</span>
+<span class="add">+    /// Show git commits with ARF reasoning</span>
+<span class="add">+    Graph {</span>
+<span class="add">+        /// Number of commits to show</span>
+<span class="add">+        #[arg(short, long, default_value = &quot;10&quot;)]</span>
+<span class="add">+        limit: usize,</span>
+<span class="add">+    },</span>
+ }
+ 
+ #[derive(Debug, Serialize, Deserialize)]
+<span class="hunk">@@ -97,6 +104,7 @@ fn main() -&gt; Result&lt;()&gt; {</span>
+         } =&gt; cmd_record(what, why, how, backup, commit)?,
+         Commands::Log { commit, limit } =&gt; cmd_log(commit, limit)?,
+         Commands::Sync { push, pull } =&gt; cmd_sync(push, pull)?,
+<span class="add">+        Commands::Graph { limit } =&gt; cmd_graph(limit)?,</span>
+     }
+ 
+     Ok(())
+<span class="hunk">@@ -395,3 +403,104 @@ fn cmd_sync(push: bool, pull: bool) -&gt; Result&lt;()&gt; {</span>
+ 
+     Ok(())
+ }
+<span class="add">+</span>
+<span class="add">+fn cmd_graph(limit: usize) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    // Get git log</span>
+<span class="add">+    let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([</span>
+<span class="add">+            &quot;log&quot;,</span>
+<span class="add">+            &quot;--oneline&quot;,</span>
+<span class="add">+            &quot;--no-decorate&quot;,</span>
+<span class="add">+            &amp;format!(&quot;-{}&quot;, limit),</span>
+<span class="add">+        ])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !output.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Failed to get git log&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let log = String::from_utf8_lossy(&amp;output.stdout);</span>
+<span class="add">+    let commits: Vec&lt;&amp;str&gt; = log.lines().collect();</span>
+<span class="add">+</span>
+<span class="add">+    if commits.is_empty() {</span>
+<span class="add">+        println!(&quot;No commits found.&quot;);</span>
+<span class="add">+        return Ok(());</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let records_dir = Path::new(&quot;.arf/records&quot;);</span>
+<span class="add">+    let has_arf = records_dir.exists();</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;Git + ARF History:\n&quot;);</span>
+<span class="add">+</span>
+<span class="add">+    for (i, line) in commits.iter().enumerate() {</span>
+<span class="add">+        let parts: Vec&lt;&amp;str&gt; = line.splitn(2, &#39; &#39;).collect();</span>
+<span class="add">+        let (sha, msg) = if parts.len() == 2 {</span>
+<span class="add">+            (parts[0], parts[1])</span>
+<span class="add">+        } else {</span>
+<span class="add">+            (parts[0], &quot;&quot;)</span>
+<span class="add">+        };</span>
+<span class="add">+</span>
+<span class="add">+        // Graph connector</span>
+<span class="add">+        let is_last = i == commits.len() - 1;</span>
+<span class="add">+        let connector = if is_last { &quot;└&quot; } else { &quot;├&quot; };</span>
+<span class="add">+        let continuation = if is_last { &quot; &quot; } else { &quot;│&quot; };</span>
+<span class="add">+</span>
+<span class="add">+        // Print commit line</span>
+<span class="add">+        println!(&quot;{}─● {} {}&quot;, connector, sha, msg);</span>
+<span class="add">+</span>
+<span class="add">+        // Check for ARF records for this commit</span>
+<span class="add">+        if has_arf {</span>
+<span class="add">+            // Try to find matching records dir (git log shows 7 chars, records use 8)</span>
+<span class="add">+            let commit_records_dir = if let Ok(entries) = std::fs::read_dir(&amp;records_dir) {</span>
+<span class="add">+                entries</span>
+<span class="add">+                    .filter_map(|e| e.ok())</span>
+<span class="add">+                    .find(|e| {</span>
+<span class="add">+                        e.file_name()</span>
+<span class="add">+                            .to_string_lossy()</span>
+<span class="add">+                            .starts_with(sha)</span>
+<span class="add">+                    })</span>
+<span class="add">+                    .map(|e| e.path())</span>
+<span class="add">+            } else {</span>
+<span class="add">+                None</span>
+<span class="add">+            };</span>
+<span class="add">+</span>
+<span class="add">+            if let Some(commit_records_dir) = commit_records_dir {</span>
+<span class="add">+                if let Ok(entries) = std::fs::read_dir(&amp;commit_records_dir) {</span>
+<span class="add">+                    let mut records: Vec&lt;ArfRecord&gt; = Vec::new();</span>
+<span class="add">+</span>
+<span class="add">+                    for entry in entries.filter_map(|e| e.ok()) {</span>
+<span class="add">+                        let path = entry.path();</span>
+<span class="add">+                        if path.extension().map_or(false, |e| e == &quot;toml&quot;) {</span>
+<span class="add">+                            if let Ok(content) = std::fs::read_to_string(&amp;path) {</span>
+<span class="add">+                                if let Ok(record) = toml::from_str::&lt;ArfRecord&gt;(&amp;content) {</span>
+<span class="add">+                                    records.push(record);</span>
+<span class="add">+                                }</span>
+<span class="add">+                            }</span>
+<span class="add">+                        }</span>
+<span class="add">+                    }</span>
+<span class="add">+</span>
+<span class="add">+                    // Sort by timestamp</span>
+<span class="add">+                    records.sort_by(|a, b| a.timestamp.cmp(&amp;b.timestamp));</span>
+<span class="add">+</span>
+<span class="add">+                    for (j, record) in records.iter().enumerate() {</span>
+<span class="add">+                        let is_last_record = j == records.len() - 1;</span>
+<span class="add">+                        let rec_connector = if is_last_record { &quot;└&quot; } else { &quot;├&quot; };</span>
+<span class="add">+</span>
+<span class="add">+                        println!(&quot;{}  {}─ what: {}&quot;, continuation, rec_connector, record.what);</span>
+<span class="add">+                        println!(&quot;{}  {}   why: {}&quot;, continuation, if is_last_record { &quot; &quot; } else { &quot;│&quot; }, record.why);</span>
+<span class="add">+</span>
+<span class="add">+                        if let Some(ref how) = record.how {</span>
+<span class="add">+                            println!(&quot;{}  {}   how: {}&quot;, continuation, if is_last_record { &quot; &quot; } else { &quot;│&quot; }, how);</span>
+<span class="add">+                        }</span>
+<span class="add">+                    }</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    if !has_arf {</span>
+<span class="add">+        println!(&quot;\n(ARF not initialized - run &#39;arf init&#39; for reasoning context)&quot;);</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+    <article class="commit" id="commit-61f221cb07e043f64c6aed8244bddc2e49e7f75b">
+      <header class="commit-header">
+        <span class="sha">61f221cb</span>
+        <span class="commit-message">Merge branch &#x27;fix&#x2F;init-detects-existing-branch&#x27;</span>
+        <span class="timestamp">2026-06-07T13:31:23-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Ship --version flag</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Two-line change plus one test. arf --version (or -V) now prints &#x27;arf &lt;version&gt;&#x27; sourced from CARGO_PKG_VERSION. Test asserts the shape using env!(CARGO_PKG_VERSION) so it doesn&#x27;t drift when the version bumps.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Added #[command(version)] to Cli&#x27;s derive, which clap turns into a --version&#x2F;-V flag automatically. Test uses str::contains(env!(CARGO_PKG_VERSION)) to avoid hardcoding the version string.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:33:39.438210084+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add --version flag to the arf CLI via clap&#x27;s #[command(version)]</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">A CLI on crates.io without --version is embarrassing - it&#x27;s table-stakes for any installable tool, and people often run --version as a sanity check after cargo install. Caught when manually verifying the first crates.io publish; the tool installed cleanly but couldn&#x27;t tell me what version had landed.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Add version = clap derive attribute on Cli (sources from CARGO_PKG_VERSION). Add an integration test that runs &#x27;arf --version&#x27; and asserts the version string format matches the Cargo.toml version. clap also auto-implements -V as a short form.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:32:02.481237282+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-7cb50cbd49a833bd200befc340918256fc1c4ac3">
+      <header class="commit-header">
+        <span class="sha">7cb50cbd</span>
+        <span class="commit-message">Merge branch &#x27;feat&#x2F;version-flag&#x27;</span>
+        <span class="timestamp">2026-06-07T13:34:14-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Ship arf why and the files field on records</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Headline feature for v0.3. arf why &lt;file&gt;:&lt;line&gt; works end-to-end against real git blame; FileRef covers&#x2F;parse logic is unit-tested separately; integration tests cover both --file flag persistence and the why round-trip. Smoke test on this repo confirmed the right failure mode (no records for the queried line, because blame resolved to a commit without file-scoped records).</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Three layers. record.rs got FileRef + Option&lt;Vec&lt;FileRef&gt;&gt; on ArfRecord, plus unit tests for parse&#x2F;covers. record::run accepts files: Vec&lt;String&gt;, parses each via FileRef::parse, threads into the record. New commands&#x2F;why.rs runs git blame --porcelain to get the SHA, calls load_records(Some(&amp;sha)), filters by FileRef::covers, falls back to all-records-for-commit when no file-scoped records exist (so pre-v0.3 records remain findable).</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:47:54.051977393+00:00</span></div>
+              
+              
+                <div class="files">
+                  <span class="file-ref">src&#x2F;record.rs</span><span class="file-ref">src&#x2F;commands&#x2F;why.rs</span><span class="file-ref">src&#x2F;commands&#x2F;record.rs</span><span class="file-ref">src&#x2F;main.rs</span>
+                </div>
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add files field to ArfRecord and a new &#x27;arf why&#x27; subcommand that resolves file:line back to reasoning</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">This is the feature that earns the &#x27;git blame, but for reasoning&#x27; framing the blog post staked out. Records anchored only to commit SHA are useful but coarse; once records can point at specific file:line ranges, the format becomes queryable as a per-line annotation layer instead of a sequential log. arf why &lt;file&gt;:&lt;line&gt; is the moment a reader can ask &#x27;why does this code exist&#x27; and get back the agent&#x27;s reasoning, the same way git blame answers &#x27;who wrote this&#x27;.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Two pieces. (1) Schema: add files: Option&lt;Vec&lt;FileRef&gt;&gt; to ArfRecord. FileRef has path + optional lines: Option&lt;[u32; 2]&gt; for inclusive ranges. CLI takes --file FLAG=path:start-end or path:line or path (3 forms). (2) arf why subcommand: takes file:line as a positional arg, runs git blame to resolve the line to a commit SHA, looks up records for that SHA via the existing load_records helper, filters to records that mention the file (and ideally a line range covering the queried line), prints them human-readable. Integration tests cover the parse cases (path, path:line, path:start-end) plus the end-to-end why flow.</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">If the file:line parsing turns out to be brittle (Windows path separators, files with colons in names, etc), fall back to --file PATH --lines START-END as separate flags. Revert the schema change if downstream tooling chokes - files is additive so old records still parse; new records with the field stay valid against any v0.x consumer that ignores unknown fields.</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:36:31.325785360+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-7d7e3c230b4d11e63649eda4256dc24ac30101fc">
+      <header class="commit-header">
+        <span class="sha">7d7e3c23</span>
+        <span class="commit-message">Merge branch &#x27;release&#x2F;v20260607.0.4&#x27;</span>
+        <span class="timestamp">2026-06-07T13:48:50-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Update README to reflect v20260608.0.0 features and the &#x27;git why&#x27; framing</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">The README was still describing v0.1 - no mention of arf why, files field, the init branch-detection fix, --version, the Claude Code skill, or that the crate is on crates.io as arf-cli. Visitors landing from a search or HN link were getting a stale picture of what the tool actually does. Also: the README lead with &#x27;A standard format for structured agent reasoning&#x27; which is technically accurate but doesn&#x27;t hook anyone. The blog post landed on &#x27;git blame tells you who, arf why tells you why&#x27; as the pitch - readme should match.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Rewrote intro to lead with the git blame &#x2F; arf why framing. Added arf why example as the headline visualization. Added Claude Code skill section pointing at arf-skill + skillz. Updated install section to remove duplicate Installation header and clarify the arf-cli&#x2F;arf binary name split. Bumped status note from &#x27;v0.1 reference impl&#x27; to &#x27;on crates.io as arf-cli&#x27;. Replaced the unicode box-drawing characters in the graph example with ASCII pipes&#x2F;plusses since markdown viewers render them inconsistently.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T20:51:39.782536913+00:00</span></div>
+              
+              
+                <div class="files">
+                  <span class="file-ref">README.md</span>
+                </div>
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-8ae882e6563d67144d62edd226cebeca9e49c9a1">
+      <header class="commit-header">
+        <span class="sha">8ae882e6</span>
+        <span class="commit-message">Add diff command with ARF reasoning context</span>
+        <span class="timestamp">2026-02-02T15:21:13-08:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add diff command</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Combine git diff with ARF reasoning for full context review</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Shows reasoning header then git show output, --stat default with --full option</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-02-02T23:21:33.932841303+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/src/main.rs b/src/main.rs
+index 1d8fa7c..21a18e6 100644
+--- a/src/main.rs
++++ b/src/main.rs
+<span class="hunk">@@ -71,6 +71,17 @@ enum Commands {</span>
+         #[arg(short, long, default_value = &quot;10&quot;)]
+         limit: usize,
+     },
+<span class="add">+</span>
+<span class="add">+    /// Show diff with ARF reasoning context</span>
+<span class="add">+    Diff {</span>
+<span class="add">+        /// Commit to diff (defaults to HEAD)</span>
+<span class="add">+        #[arg(short, long)]</span>
+<span class="add">+        commit: Option&lt;String&gt;,</span>
+<span class="add">+</span>
+<span class="add">+        /// Show full diff instead of stat summary</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        full: bool,</span>
+<span class="add">+    },</span>
+ }
+ 
+ #[derive(Debug, Serialize, Deserialize)]
+<span class="hunk">@@ -105,6 +116,7 @@ fn main() -&gt; Result&lt;()&gt; {</span>
+         Commands::Log { commit, limit } =&gt; cmd_log(commit, limit)?,
+         Commands::Sync { push, pull } =&gt; cmd_sync(push, pull)?,
+         Commands::Graph { limit } =&gt; cmd_graph(limit)?,
+<span class="add">+        Commands::Diff { commit, full } =&gt; cmd_diff(commit, full)?,</span>
+     }
+ 
+     Ok(())
+<span class="hunk">@@ -504,3 +516,109 @@ fn cmd_graph(limit: usize) -&gt; Result&lt;()&gt; {</span>
+ 
+     Ok(())
+ }
+<span class="add">+</span>
+<span class="add">+fn cmd_diff(commit: Option&lt;String&gt;, full: bool) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    // Get the commit SHA (default to HEAD)</span>
+<span class="add">+    let sha = match commit {</span>
+<span class="add">+        Some(c) =&gt; c,</span>
+<span class="add">+        None =&gt; {</span>
+<span class="add">+            let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+                .args([&quot;rev-parse&quot;, &quot;HEAD&quot;])</span>
+<span class="add">+                .output()?;</span>
+<span class="add">+            if !output.status.success() {</span>
+<span class="add">+                return Err(anyhow!(&quot;Failed to get HEAD&quot;));</span>
+<span class="add">+            }</span>
+<span class="add">+            String::from_utf8_lossy(&amp;output.stdout).trim().to_string()</span>
+<span class="add">+        }</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    // Get commit info</span>
+<span class="add">+    let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;log&quot;, &quot;-1&quot;, &quot;--oneline&quot;, &amp;sha])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !output.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Commit not found: {}&quot;, sha));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let commit_line = String::from_utf8_lossy(&amp;output.stdout);</span>
+<span class="add">+    let commit_line = commit_line.trim();</span>
+<span class="add">+</span>
+<span class="add">+    // Print ARF context first</span>
+<span class="add">+    let records_dir = Path::new(&quot;.arf/records&quot;);</span>
+<span class="add">+    let short_sha = &amp;sha[..8.min(sha.len())];</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;═══════════════════════════════════════════════════════════════&quot;);</span>
+<span class="add">+    println!(&quot;Commit: {}&quot;, commit_line);</span>
+<span class="add">+    println!(&quot;═══════════════════════════════════════════════════════════════&quot;);</span>
+<span class="add">+</span>
+<span class="add">+    if records_dir.exists() {</span>
+<span class="add">+        // Find matching records dir (match either direction for flexibility)</span>
+<span class="add">+        let commit_records_dir = std::fs::read_dir(&amp;records_dir)</span>
+<span class="add">+            .ok()</span>
+<span class="add">+            .and_then(|entries| {</span>
+<span class="add">+                entries</span>
+<span class="add">+                    .filter_map(|e| e.ok())</span>
+<span class="add">+                    .find(|e| {</span>
+<span class="add">+                        let dir_name = e.file_name().to_string_lossy().to_string();</span>
+<span class="add">+                        dir_name.starts_with(short_sha) || short_sha.starts_with(&amp;dir_name)</span>
+<span class="add">+                    })</span>
+<span class="add">+                    .map(|e| e.path())</span>
+<span class="add">+            });</span>
+<span class="add">+</span>
+<span class="add">+        if let Some(dir) = commit_records_dir {</span>
+<span class="add">+            if let Ok(entries) = std::fs::read_dir(&amp;dir) {</span>
+<span class="add">+                let mut records: Vec&lt;ArfRecord&gt; = Vec::new();</span>
+<span class="add">+</span>
+<span class="add">+                for entry in entries.filter_map(|e| e.ok()) {</span>
+<span class="add">+                    let path = entry.path();</span>
+<span class="add">+                    if path.extension().map_or(false, |e| e == &quot;toml&quot;) {</span>
+<span class="add">+                        if let Ok(content) = std::fs::read_to_string(&amp;path) {</span>
+<span class="add">+                            if let Ok(record) = toml::from_str::&lt;ArfRecord&gt;(&amp;content) {</span>
+<span class="add">+                                records.push(record);</span>
+<span class="add">+                            }</span>
+<span class="add">+                        }</span>
+<span class="add">+                    }</span>
+<span class="add">+                }</span>
+<span class="add">+</span>
+<span class="add">+                records.sort_by(|a, b| a.timestamp.cmp(&amp;b.timestamp));</span>
+<span class="add">+</span>
+<span class="add">+                if !records.is_empty() {</span>
+<span class="add">+                    println!();</span>
+<span class="add">+                    println!(&quot;REASONING:&quot;);</span>
+<span class="add">+                    for record in &amp;records {</span>
+<span class="add">+                        println!(&quot;  what: {}&quot;, record.what);</span>
+<span class="add">+                        println!(&quot;  why:  {}&quot;, record.why);</span>
+<span class="add">+                        if let Some(ref how) = record.how {</span>
+<span class="add">+                            println!(&quot;  how:  {}&quot;, how);</span>
+<span class="add">+                        }</span>
+<span class="add">+                        println!();</span>
+<span class="add">+                    }</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+        } else {</span>
+<span class="add">+            println!();</span>
+<span class="add">+            println!(&quot;(no ARF record for this commit)&quot;);</span>
+<span class="add">+            println!();</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;───────────────────────────────────────────────────────────────&quot;);</span>
+<span class="add">+    println!(&quot;CHANGES:&quot;);</span>
+<span class="add">+    println!();</span>
+<span class="add">+</span>
+<span class="add">+    // Show diff</span>
+<span class="add">+    let diff_args = if full {</span>
+<span class="add">+        vec![&quot;show&quot;, &quot;--format=&quot;, &amp;sha]</span>
+<span class="add">+    } else {</span>
+<span class="add">+        vec![&quot;show&quot;, &quot;--stat&quot;, &quot;--format=&quot;, &amp;sha]</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    let diff_output = Command::new(&quot;git&quot;).args(&amp;diff_args).output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if diff_output.status.success() {</span>
+<span class="add">+        print!(&quot;{}&quot;, String::from_utf8_lossy(&amp;diff_output.stdout));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+    <article class="commit" id="commit-8ec6c985b9200de2bfecaee39242fa4c515861d6">
+      <header class="commit-header">
+        <span class="sha">8ec6c985</span>
+        <span class="commit-message">Add ARF CLI reference implementation</span>
+        <span class="timestamp">2026-02-02T15:14:56-08:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add graph command for unified git+arf visualization</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Enables reviewing git history with reasoning context in one view</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Matches commit SHAs to .arf&#x2F;records directories, renders tree-style output</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-02-02T23:18:16.336998283+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Commit ARF CLI implementation</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">First working version ready for testing</span></div>
+              <div class="field"><span class="label">How</span><span class="value">init&#x2F;record&#x2F;log&#x2F;sync commands, orphan branch storage pattern from lok debate</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">claude · 2026-02-02T23:15:19.067228888+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..25fb1e8
+--- /dev/null
++++ b/.gitignore
+<span class="hunk">@@ -0,0 +1,2 @@</span>
+<span class="add">+.arf/</span>
+<span class="add">+/target/</span>
+diff --git a/Cargo.lock b/Cargo.lock
+new file mode 100644
+index 0000000..73b5786
+--- /dev/null
++++ b/Cargo.lock
+<span class="hunk">@@ -0,0 +1,547 @@</span>
+<span class="add">+# This file is automatically @generated by Cargo.</span>
+<span class="add">+# It is not intended for manual editing.</span>
+<span class="add">+version = 4</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;android_system_properties&quot;</span>
+<span class="add">+version = &quot;0.1.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;libc&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anstream&quot;</span>
+<span class="add">+version = &quot;0.6.21&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;43d5b281e737544384e969a5ccad3f1cdd24b48086a0fc1b2a5262a26b8f4f4a&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;anstyle&quot;,</span>
+<span class="add">+ &quot;anstyle-parse&quot;,</span>
+<span class="add">+ &quot;anstyle-query&quot;,</span>
+<span class="add">+ &quot;anstyle-wincon&quot;,</span>
+<span class="add">+ &quot;colorchoice&quot;,</span>
+<span class="add">+ &quot;is_terminal_polyfill&quot;,</span>
+<span class="add">+ &quot;utf8parse&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anstyle&quot;</span>
+<span class="add">+version = &quot;1.0.13&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5192cca8006f1fd4f7237516f40fa183bb07f8fbdfedaa0036de5ea9b0b45e78&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anstyle-parse&quot;</span>
+<span class="add">+version = &quot;0.2.7&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;4e7644824f0aa2c7b9384579234ef10eb7efb6a0deb83f9630a49594dd9c15c2&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;utf8parse&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anstyle-query&quot;</span>
+<span class="add">+version = &quot;1.1.5&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-sys&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anstyle-wincon&quot;</span>
+<span class="add">+version = &quot;3.0.11&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;anstyle&quot;,</span>
+<span class="add">+ &quot;once_cell_polyfill&quot;,</span>
+<span class="add">+ &quot;windows-sys&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;anyhow&quot;</span>
+<span class="add">+version = &quot;1.0.100&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;arf&quot;</span>
+<span class="add">+version = &quot;0.1.0&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;anyhow&quot;,</span>
+<span class="add">+ &quot;chrono&quot;,</span>
+<span class="add">+ &quot;clap&quot;,</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+ &quot;toml&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;autocfg&quot;</span>
+<span class="add">+version = &quot;1.5.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;bumpalo&quot;</span>
+<span class="add">+version = &quot;3.19.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5dd9dc738b7a8311c7ade152424974d8115f2cdad61e8dab8dac9f2362298510&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;cc&quot;</span>
+<span class="add">+version = &quot;1.2.55&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;47b26a0954ae34af09b50f0de26458fa95369a0d478d8236d3f93082b219bd29&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;find-msvc-tools&quot;,</span>
+<span class="add">+ &quot;shlex&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;cfg-if&quot;</span>
+<span class="add">+version = &quot;1.0.4&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;chrono&quot;</span>
+<span class="add">+version = &quot;0.4.43&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;fac4744fb15ae8337dc853fee7fb3f4e48c0fbaa23d0afe49c447b4fab126118&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;iana-time-zone&quot;,</span>
+<span class="add">+ &quot;js-sys&quot;,</span>
+<span class="add">+ &quot;num-traits&quot;,</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen&quot;,</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;clap&quot;</span>
+<span class="add">+version = &quot;4.5.56&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a75ca66430e33a14957acc24c5077b503e7d374151b2b4b3a10c83b4ceb4be0e&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;clap_builder&quot;,</span>
+<span class="add">+ &quot;clap_derive&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;clap_builder&quot;</span>
+<span class="add">+version = &quot;4.5.56&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;793207c7fa6300a0608d1080b858e5fdbe713cdc1c8db9fb17777d8a13e63df0&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;anstream&quot;,</span>
+<span class="add">+ &quot;anstyle&quot;,</span>
+<span class="add">+ &quot;clap_lex&quot;,</span>
+<span class="add">+ &quot;strsim&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;clap_derive&quot;</span>
+<span class="add">+version = &quot;4.5.55&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a92793da1a46a5f2a02a6f4c46c6496b28c43638adea8306fcb0caa1634f24e5&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;heck&quot;,</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;clap_lex&quot;</span>
+<span class="add">+version = &quot;0.7.7&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;c3e64b0cc0439b12df2fa678eae89a1c56a529fd067a9115f7827f1fffd22b32&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;colorchoice&quot;</span>
+<span class="add">+version = &quot;1.0.4&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;core-foundation-sys&quot;</span>
+<span class="add">+version = &quot;0.8.7&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;equivalent&quot;</span>
+<span class="add">+version = &quot;1.0.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;find-msvc-tools&quot;</span>
+<span class="add">+version = &quot;0.1.9&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;hashbrown&quot;</span>
+<span class="add">+version = &quot;0.16.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;heck&quot;</span>
+<span class="add">+version = &quot;0.5.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;iana-time-zone&quot;</span>
+<span class="add">+version = &quot;0.1.65&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;e31bc9ad994ba00e440a8aa5c9ef0ec67d5cb5e5cb0cc7f8b744a35b389cc470&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;android_system_properties&quot;,</span>
+<span class="add">+ &quot;core-foundation-sys&quot;,</span>
+<span class="add">+ &quot;iana-time-zone-haiku&quot;,</span>
+<span class="add">+ &quot;js-sys&quot;,</span>
+<span class="add">+ &quot;log&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen&quot;,</span>
+<span class="add">+ &quot;windows-core&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;iana-time-zone-haiku&quot;</span>
+<span class="add">+version = &quot;0.1.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;f31827a206f56af32e590ba56d5d2d085f558508192593743f16b2306495269f&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;cc&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;indexmap&quot;</span>
+<span class="add">+version = &quot;2.13.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;equivalent&quot;,</span>
+<span class="add">+ &quot;hashbrown&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;is_terminal_polyfill&quot;</span>
+<span class="add">+version = &quot;1.70.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;js-sys&quot;</span>
+<span class="add">+version = &quot;0.3.85&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;8c942ebf8e95485ca0d52d97da7c5a2c387d0e7f0ba4c35e93bfcaee045955b3&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;once_cell&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;libc&quot;</span>
+<span class="add">+version = &quot;0.2.180&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;bcc35a38544a891a5f7c865aca548a982ccb3b8650a5b06d0fd33a10283c56fc&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;log&quot;</span>
+<span class="add">+version = &quot;0.4.29&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;memchr&quot;</span>
+<span class="add">+version = &quot;2.7.6&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;num-traits&quot;</span>
+<span class="add">+version = &quot;0.2.19&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;autocfg&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;once_cell&quot;</span>
+<span class="add">+version = &quot;1.21.3&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;once_cell_polyfill&quot;</span>
+<span class="add">+version = &quot;1.70.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;proc-macro2&quot;</span>
+<span class="add">+version = &quot;1.0.106&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;8fd00f0bb2e90d81d1044c2b32617f68fcb9fa3bb7640c23e9c748e53fb30934&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;unicode-ident&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;quote&quot;</span>
+<span class="add">+version = &quot;1.0.44&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;rustversion&quot;</span>
+<span class="add">+version = &quot;1.0.22&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;serde&quot;</span>
+<span class="add">+version = &quot;1.0.228&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;serde_core&quot;,</span>
+<span class="add">+ &quot;serde_derive&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;serde_core&quot;</span>
+<span class="add">+version = &quot;1.0.228&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;41d385c7d4ca58e59fc732af25c3983b67ac852c1a25000afe1175de458b67ad&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;serde_derive&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;serde_derive&quot;</span>
+<span class="add">+version = &quot;1.0.228&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;d540f220d3187173da220f885ab66608367b6574e925011a9353e4badda91d79&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;serde_spanned&quot;</span>
+<span class="add">+version = &quot;0.6.9&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;bf41e0cfaf7226dca15e8197172c295a782857fcb97fad1808a166870dee75a3&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;shlex&quot;</span>
+<span class="add">+version = &quot;1.3.0&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;strsim&quot;</span>
+<span class="add">+version = &quot;0.11.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;syn&quot;</span>
+<span class="add">+version = &quot;2.0.114&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;d4d107df263a3013ef9b1879b0df87d706ff80f65a86ea879bd9c31f9b307c2a&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;unicode-ident&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;toml&quot;</span>
+<span class="add">+version = &quot;0.8.23&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;dc1beb996b9d83529a9e75c17a1686767d148d70663143c7854d8b4a09ced362&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+ &quot;serde_spanned&quot;,</span>
+<span class="add">+ &quot;toml_datetime&quot;,</span>
+<span class="add">+ &quot;toml_edit&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;toml_datetime&quot;</span>
+<span class="add">+version = &quot;0.6.11&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;toml_edit&quot;</span>
+<span class="add">+version = &quot;0.22.27&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;indexmap&quot;,</span>
+<span class="add">+ &quot;serde&quot;,</span>
+<span class="add">+ &quot;serde_spanned&quot;,</span>
+<span class="add">+ &quot;toml_datetime&quot;,</span>
+<span class="add">+ &quot;toml_write&quot;,</span>
+<span class="add">+ &quot;winnow&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;toml_write&quot;</span>
+<span class="add">+version = &quot;0.1.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5d99f8c9a7727884afe522e9bd5edbfc91a3312b36a77b5fb8926e4c31a41801&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;unicode-ident&quot;</span>
+<span class="add">+version = &quot;1.0.22&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;utf8parse&quot;</span>
+<span class="add">+version = &quot;0.2.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;wasm-bindgen&quot;</span>
+<span class="add">+version = &quot;0.2.108&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;64024a30ec1e37399cf85a7ffefebdb72205ca1c972291c51512360d90bd8566&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;cfg-if&quot;,</span>
+<span class="add">+ &quot;once_cell&quot;,</span>
+<span class="add">+ &quot;rustversion&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen-macro&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen-shared&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;wasm-bindgen-macro&quot;</span>
+<span class="add">+version = &quot;0.2.108&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;008b239d9c740232e71bd39e8ef6429d27097518b6b30bdf9086833bd5b6d608&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen-macro-support&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;wasm-bindgen-macro-support&quot;</span>
+<span class="add">+version = &quot;0.2.108&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5256bae2d58f54820e6490f9839c49780dff84c65aeab9e772f15d5f0e913a55&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;bumpalo&quot;,</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+ &quot;wasm-bindgen-shared&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;wasm-bindgen-shared&quot;</span>
+<span class="add">+version = &quot;0.2.108&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;1f01b580c9ac74c8d8f0c0e4afb04eeef2acf145458e52c03845ee9cd23e3d12&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;unicode-ident&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-core&quot;</span>
+<span class="add">+version = &quot;0.62.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;b8e83a14d34d0623b51dce9581199302a221863196a1dde71a7663a4c2be9deb&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-implement&quot;,</span>
+<span class="add">+ &quot;windows-interface&quot;,</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+ &quot;windows-result&quot;,</span>
+<span class="add">+ &quot;windows-strings&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-implement&quot;</span>
+<span class="add">+version = &quot;0.60.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;053e2e040ab57b9dc951b72c264860db7eb3b0200ba345b4e4c3b14f67855ddf&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-interface&quot;</span>
+<span class="add">+version = &quot;0.59.3&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;3f316c4a2570ba26bbec722032c4099d8c8bc095efccdc15688708623367e358&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;proc-macro2&quot;,</span>
+<span class="add">+ &quot;quote&quot;,</span>
+<span class="add">+ &quot;syn&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-link&quot;</span>
+<span class="add">+version = &quot;0.2.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-result&quot;</span>
+<span class="add">+version = &quot;0.4.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;7781fa89eaf60850ac3d2da7af8e5242a5ea78d1a11c49bf2910bb5a73853eb5&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-strings&quot;</span>
+<span class="add">+version = &quot;0.5.1&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;windows-sys&quot;</span>
+<span class="add">+version = &quot;0.61.2&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;windows-link&quot;,</span>
+<span class="add">+]</span>
+<span class="add">+</span>
+<span class="add">+[[package]]</span>
+<span class="add">+name = &quot;winnow&quot;</span>
+<span class="add">+version = &quot;0.7.14&quot;</span>
+<span class="add">+source = &quot;registry+https://github.com/rust-lang/crates.io-index&quot;</span>
+<span class="add">+checksum = &quot;5a5364e9d77fcdeeaa6062ced926ee3381faa2ee02d3eb83a5c27a8825540829&quot;</span>
+<span class="add">+dependencies = [</span>
+<span class="add">+ &quot;memchr&quot;,</span>
+<span class="add">+]</span>
+diff --git a/Cargo.toml b/Cargo.toml
+new file mode 100644
+index 0000000..338813c
+--- /dev/null
++++ b/Cargo.toml
+<span class="hunk">@@ -0,0 +1,16 @@</span>
+<span class="add">+[package]</span>
+<span class="add">+name = &quot;arf&quot;</span>
+<span class="add">+version = &quot;0.1.0&quot;</span>
+<span class="add">+edition = &quot;2021&quot;</span>
+<span class="add">+description = &quot;Agent Reasoning Format - track AI reasoning alongside git&quot;</span>
+<span class="add">+</span>
+<span class="add">+[[bin]]</span>
+<span class="add">+name = &quot;arf&quot;</span>
+<span class="add">+path = &quot;src/main.rs&quot;</span>
+<span class="add">+</span>
+<span class="add">+[dependencies]</span>
+<span class="add">+clap = { version = &quot;4&quot;, features = [&quot;derive&quot;] }</span>
+<span class="add">+anyhow = &quot;1&quot;</span>
+<span class="add">+chrono = { version = &quot;0.4&quot;, features = [&quot;serde&quot;] }</span>
+<span class="add">+serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }</span>
+<span class="add">+toml = &quot;0.8&quot;</span>
+diff --git a/shell.nix b/shell.nix
+new file mode 100644
+index 0000000..ad15de5
+--- /dev/null
++++ b/shell.nix
+<span class="hunk">@@ -0,0 +1,24 @@</span>
+<span class="add">+{ pkgs ? import &lt;nixpkgs&gt; {} }:</span>
+<span class="add">+</span>
+<span class="add">+pkgs.mkShell {</span>
+<span class="add">+  buildInputs = with pkgs; [</span>
+<span class="add">+    rustc</span>
+<span class="add">+    cargo</span>
+<span class="add">+    rust-analyzer</span>
+<span class="add">+    clippy</span>
+<span class="add">+    rustfmt</span>
+<span class="add">+  ];</span>
+<span class="add">+</span>
+<span class="add">+  shellHook = &#39;&#39;</span>
+<span class="add">+    echo &quot;&quot;</span>
+<span class="add">+    echo &quot;ARF Development Environment&quot;</span>
+<span class="add">+    echo &quot;===========================&quot;</span>
+<span class="add">+    echo &quot;Rust: $(rustc --version)&quot;</span>
+<span class="add">+    echo &quot;&quot;</span>
+<span class="add">+    echo &quot;Commands:&quot;</span>
+<span class="add">+    echo &quot;  cargo build    - Build arf&quot;</span>
+<span class="add">+    echo &quot;  cargo run      - Run arf&quot;</span>
+<span class="add">+    echo &quot;  cargo test     - Run tests&quot;</span>
+<span class="add">+    echo &quot;&quot;</span>
+<span class="add">+  &#39;&#39;;</span>
+<span class="add">+}</span>
+diff --git a/src/main.rs b/src/main.rs
+new file mode 100644
+index 0000000..157a540
+--- /dev/null
++++ b/src/main.rs
+<span class="hunk">@@ -0,0 +1,397 @@</span>
+<span class="add">+use anyhow::{anyhow, Result};</span>
+<span class="add">+use chrono::Utc;</span>
+<span class="add">+use clap::{Parser, Subcommand};</span>
+<span class="add">+use serde::{Deserialize, Serialize};</span>
+<span class="add">+use std::path::Path;</span>
+<span class="add">+use std::process::Command;</span>
+<span class="add">+</span>
+<span class="add">+const ARF_BRANCH: &amp;str = &quot;arf&quot;;</span>
+<span class="add">+</span>
+<span class="add">+#[derive(Parser)]</span>
+<span class="add">+#[command(name = &quot;arf&quot;)]</span>
+<span class="add">+#[command(about = &quot;Agent Reasoning Format - track AI reasoning alongside git&quot;)]</span>
+<span class="add">+struct Cli {</span>
+<span class="add">+    #[command(subcommand)]</span>
+<span class="add">+    command: Commands,</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+#[derive(Subcommand)]</span>
+<span class="add">+enum Commands {</span>
+<span class="add">+    /// Initialize ARF tracking (creates orphan branch)</span>
+<span class="add">+    Init,</span>
+<span class="add">+</span>
+<span class="add">+    /// Record a reasoning entry</span>
+<span class="add">+    Record {</span>
+<span class="add">+        /// What action is being taken (required)</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        what: String,</span>
+<span class="add">+</span>
+<span class="add">+        /// Why this approach (required)</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        why: String,</span>
+<span class="add">+</span>
+<span class="add">+        /// How it will be implemented (optional)</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        how: Option&lt;String&gt;,</span>
+<span class="add">+</span>
+<span class="add">+        /// Backup/rollback plan (optional)</span>
+<span class="add">+        #[arg(short, long)]</span>
+<span class="add">+        backup: Option&lt;String&gt;,</span>
+<span class="add">+</span>
+<span class="add">+        /// Link to specific commit (defaults to HEAD)</span>
+<span class="add">+        #[arg(short, long)]</span>
+<span class="add">+        commit: Option&lt;String&gt;,</span>
+<span class="add">+    },</span>
+<span class="add">+</span>
+<span class="add">+    /// Show reasoning records</span>
+<span class="add">+    Log {</span>
+<span class="add">+        /// Show records for specific commit</span>
+<span class="add">+        #[arg(short, long)]</span>
+<span class="add">+        commit: Option&lt;String&gt;,</span>
+<span class="add">+</span>
+<span class="add">+        /// Limit number of records</span>
+<span class="add">+        #[arg(short, long, default_value = &quot;10&quot;)]</span>
+<span class="add">+        limit: usize,</span>
+<span class="add">+    },</span>
+<span class="add">+</span>
+<span class="add">+    /// Sync ARF branch with remote</span>
+<span class="add">+    Sync {</span>
+<span class="add">+        /// Push local records to remote</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        push: bool,</span>
+<span class="add">+</span>
+<span class="add">+        /// Pull remote records</span>
+<span class="add">+        #[arg(long)]</span>
+<span class="add">+        pull: bool,</span>
+<span class="add">+    },</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+#[derive(Debug, Serialize, Deserialize)]</span>
+<span class="add">+struct ArfRecord {</span>
+<span class="add">+    what: String,</span>
+<span class="add">+    why: String,</span>
+<span class="add">+    #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="add">+    how: Option&lt;String&gt;,</span>
+<span class="add">+    #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="add">+    backup: Option&lt;String&gt;,</span>
+<span class="add">+    #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="add">+    outcome: Option&lt;String&gt;,</span>
+<span class="add">+    timestamp: String,</span>
+<span class="add">+    #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="add">+    commit: Option&lt;String&gt;,</span>
+<span class="add">+    #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="add">+    agent: Option&lt;String&gt;,</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn main() -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    let cli = Cli::parse();</span>
+<span class="add">+</span>
+<span class="add">+    match cli.command {</span>
+<span class="add">+        Commands::Init =&gt; cmd_init()?,</span>
+<span class="add">+        Commands::Record {</span>
+<span class="add">+            what,</span>
+<span class="add">+            why,</span>
+<span class="add">+            how,</span>
+<span class="add">+            backup,</span>
+<span class="add">+            commit,</span>
+<span class="add">+        } =&gt; cmd_record(what, why, how, backup, commit)?,</span>
+<span class="add">+        Commands::Log { commit, limit } =&gt; cmd_log(commit, limit)?,</span>
+<span class="add">+        Commands::Sync { push, pull } =&gt; cmd_sync(push, pull)?,</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn cmd_init() -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    // Check if we&#39;re in a git repo</span>
+<span class="add">+    let status = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;rev-parse&quot;, &quot;--git-dir&quot;])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !status.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Not a git repository. Run &#39;git init&#39; first.&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Check if arf branch already exists</span>
+<span class="add">+    let branch_check = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;rev-parse&quot;, &quot;--verify&quot;, ARF_BRANCH])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if branch_check.status.success() {</span>
+<span class="add">+        println!(&quot;✓ ARF branch &#39;{}&#39; already exists&quot;, ARF_BRANCH);</span>
+<span class="add">+        return Ok(());</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;Initializing ARF...&quot;);</span>
+<span class="add">+</span>
+<span class="add">+    // Create orphan branch using worktree</span>
+<span class="add">+    let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;worktree&quot;, &quot;add&quot;, &quot;--orphan&quot;, &quot;-b&quot;, ARF_BRANCH, &quot;.arf&quot;])</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !output.status.success() {</span>
+<span class="add">+        return Err(anyhow!(</span>
+<span class="add">+            &quot;Failed to create ARF branch: {}&quot;,</span>
+<span class="add">+            String::from_utf8_lossy(&amp;output.stderr)</span>
+<span class="add">+        ));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Create initial structure</span>
+<span class="add">+    std::fs::create_dir_all(&quot;.arf/records&quot;)?;</span>
+<span class="add">+</span>
+<span class="add">+    // Create README in arf branch</span>
+<span class="add">+    let readme = r#&quot;# ARF Records</span>
+<span class="add">+</span>
+<span class="add">+This branch contains Agent Reasoning Format records.</span>
+<span class="add">+</span>
+<span class="add">+Records are organized by commit SHA:</span>
+<span class="add">+```</span>
+<span class="add">+records/</span>
+<span class="add">+  &lt;commit-sha&gt;/</span>
+<span class="add">+    &lt;agent&gt;-&lt;timestamp&gt;.toml</span>
+<span class="add">+```</span>
+<span class="add">+</span>
+<span class="add">+See https://github.com/ducks/arf for the ARF specification.</span>
+<span class="add">+&quot;#;</span>
+<span class="add">+    std::fs::write(&quot;.arf/README.md&quot;, readme)?;</span>
+<span class="add">+</span>
+<span class="add">+    // Commit initial structure</span>
+<span class="add">+    let add = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;add&quot;, &quot;.&quot;])</span>
+<span class="add">+        .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !add.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Failed to stage files&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let commit = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;commit&quot;, &quot;-m&quot;, &quot;Initialize ARF&quot;])</span>
+<span class="add">+        .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !commit.status.success() {</span>
+<span class="add">+        // Might be empty, that&#39;s ok</span>
+<span class="add">+        let stderr = String::from_utf8_lossy(&amp;commit.stderr);</span>
+<span class="add">+        if !stderr.contains(&quot;nothing to commit&quot;) {</span>
+<span class="add">+            return Err(anyhow!(&quot;Failed to commit: {}&quot;, stderr));</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;✓ Created ARF branch &#39;{}&#39;&quot;, ARF_BRANCH);</span>
+<span class="add">+    println!(&quot;✓ Mounted at .arf/&quot;);</span>
+<span class="add">+    println!();</span>
+<span class="add">+    println!(&quot;Next: arf record --what &#39;action&#39; --why &#39;reason&#39;&quot;);</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn cmd_record(</span>
+<span class="add">+    what: String,</span>
+<span class="add">+    why: String,</span>
+<span class="add">+    how: Option&lt;String&gt;,</span>
+<span class="add">+    backup: Option&lt;String&gt;,</span>
+<span class="add">+    commit: Option&lt;String&gt;,</span>
+<span class="add">+) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    // Check if arf is initialized</span>
+<span class="add">+    if !Path::new(&quot;.arf&quot;).exists() {</span>
+<span class="add">+        return Err(anyhow!(&quot;ARF not initialized. Run &#39;arf init&#39; first.&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Get commit SHA (default to HEAD)</span>
+<span class="add">+    let commit_sha = match commit {</span>
+<span class="add">+        Some(c) =&gt; c,</span>
+<span class="add">+        None =&gt; {</span>
+<span class="add">+            let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+                .args([&quot;rev-parse&quot;, &quot;HEAD&quot;])</span>
+<span class="add">+                .output()?;</span>
+<span class="add">+            if !output.status.success() {</span>
+<span class="add">+                return Err(anyhow!(&quot;Failed to get HEAD commit&quot;));</span>
+<span class="add">+            }</span>
+<span class="add">+            String::from_utf8_lossy(&amp;output.stdout).trim().to_string()</span>
+<span class="add">+        }</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    let short_sha = &amp;commit_sha[..8.min(commit_sha.len())];</span>
+<span class="add">+</span>
+<span class="add">+    // Create record</span>
+<span class="add">+    let record = ArfRecord {</span>
+<span class="add">+        what,</span>
+<span class="add">+        why,</span>
+<span class="add">+        how,</span>
+<span class="add">+        backup,</span>
+<span class="add">+        outcome: None,</span>
+<span class="add">+        timestamp: Utc::now().to_rfc3339(),</span>
+<span class="add">+        commit: Some(commit_sha.clone()),</span>
+<span class="add">+        agent: std::env::var(&quot;ARF_AGENT&quot;).ok(),</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    // Create directory for this commit</span>
+<span class="add">+    let record_dir = format!(&quot;.arf/records/{}&quot;, short_sha);</span>
+<span class="add">+    std::fs::create_dir_all(&amp;record_dir)?;</span>
+<span class="add">+</span>
+<span class="add">+    // Generate filename</span>
+<span class="add">+    let timestamp = Utc::now().format(&quot;%Y%m%d-%H%M%S&quot;);</span>
+<span class="add">+    let agent = record.agent.as_deref().unwrap_or(&quot;unknown&quot;);</span>
+<span class="add">+    let filename = format!(&quot;{}/{}-{}.toml&quot;, record_dir, agent, timestamp);</span>
+<span class="add">+</span>
+<span class="add">+    // Write record</span>
+<span class="add">+    let content = toml::to_string_pretty(&amp;record)?;</span>
+<span class="add">+    std::fs::write(&amp;filename, &amp;content)?;</span>
+<span class="add">+</span>
+<span class="add">+    // Commit to arf branch</span>
+<span class="add">+    let add = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;add&quot;, &quot;.&quot;])</span>
+<span class="add">+        .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !add.status.success() {</span>
+<span class="add">+        return Err(anyhow!(&quot;Failed to stage record&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let commit_msg = format!(&quot;Record: {}&quot;, record.what);</span>
+<span class="add">+    let commit_result = Command::new(&quot;git&quot;)</span>
+<span class="add">+        .args([&quot;commit&quot;, &quot;-m&quot;, &amp;commit_msg])</span>
+<span class="add">+        .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+        .output()?;</span>
+<span class="add">+</span>
+<span class="add">+    if !commit_result.status.success() {</span>
+<span class="add">+        let stderr = String::from_utf8_lossy(&amp;commit_result.stderr);</span>
+<span class="add">+        if !stderr.contains(&quot;nothing to commit&quot;) {</span>
+<span class="add">+            return Err(anyhow!(&quot;Failed to commit record: {}&quot;, stderr));</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;✓ Recorded: {}&quot;, record.what);</span>
+<span class="add">+    println!(&quot;  Commit: {}&quot;, short_sha);</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn cmd_log(commit: Option&lt;String&gt;, limit: usize) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    if !Path::new(&quot;.arf/records&quot;).exists() {</span>
+<span class="add">+        return Err(anyhow!(&quot;ARF not initialized. Run &#39;arf init&#39; first.&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    let records_dir = Path::new(&quot;.arf/records&quot;);</span>
+<span class="add">+    let mut all_records: Vec&lt;(String, ArfRecord)&gt; = Vec::new();</span>
+<span class="add">+</span>
+<span class="add">+    // If specific commit requested, only look there</span>
+<span class="add">+    let dirs_to_check: Vec&lt;_&gt; = if let Some(ref sha) = commit {</span>
+<span class="add">+        let short = &amp;sha[..8.min(sha.len())];</span>
+<span class="add">+        let path = records_dir.join(short);</span>
+<span class="add">+        if path.exists() {</span>
+<span class="add">+            vec![path]</span>
+<span class="add">+        } else {</span>
+<span class="add">+            println!(&quot;No records for commit {}&quot;, short);</span>
+<span class="add">+            return Ok(());</span>
+<span class="add">+        }</span>
+<span class="add">+    } else {</span>
+<span class="add">+        std::fs::read_dir(records_dir)?</span>
+<span class="add">+            .filter_map(|e| e.ok())</span>
+<span class="add">+            .map(|e| e.path())</span>
+<span class="add">+            .filter(|p| p.is_dir())</span>
+<span class="add">+            .collect()</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    // Read all records</span>
+<span class="add">+    for dir in dirs_to_check {</span>
+<span class="add">+        if let Ok(entries) = std::fs::read_dir(&amp;dir) {</span>
+<span class="add">+            for entry in entries.filter_map(|e| e.ok()) {</span>
+<span class="add">+                let path = entry.path();</span>
+<span class="add">+                if path.extension().map_or(false, |e| e == &quot;toml&quot;) {</span>
+<span class="add">+                    if let Ok(content) = std::fs::read_to_string(&amp;path) {</span>
+<span class="add">+                        if let Ok(record) = toml::from_str::&lt;ArfRecord&gt;(&amp;content) {</span>
+<span class="add">+                            let filename = path.file_name().unwrap().to_string_lossy().to_string();</span>
+<span class="add">+                            all_records.push((filename, record));</span>
+<span class="add">+                        }</span>
+<span class="add">+                    }</span>
+<span class="add">+                }</span>
+<span class="add">+            }</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Sort by timestamp (newest first)</span>
+<span class="add">+    all_records.sort_by(|a, b| b.1.timestamp.cmp(&amp;a.1.timestamp));</span>
+<span class="add">+</span>
+<span class="add">+    // Limit</span>
+<span class="add">+    let records: Vec&lt;_&gt; = all_records.into_iter().take(limit).collect();</span>
+<span class="add">+</span>
+<span class="add">+    if records.is_empty() {</span>
+<span class="add">+        println!(&quot;No ARF records found.&quot;);</span>
+<span class="add">+        return Ok(());</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    println!(&quot;ARF Records ({}):\n&quot;, records.len());</span>
+<span class="add">+</span>
+<span class="add">+    for (_filename, record) in records {</span>
+<span class="add">+        let commit_str = record</span>
+<span class="add">+            .commit</span>
+<span class="add">+            .as_ref()</span>
+<span class="add">+            .map(|c| &amp;c[..8.min(c.len())])</span>
+<span class="add">+            .unwrap_or(&quot;none&quot;);</span>
+<span class="add">+</span>
+<span class="add">+        println!(&quot;commit {}&quot;, commit_str);</span>
+<span class="add">+        println!(&quot;what: {}&quot;, record.what);</span>
+<span class="add">+        println!(&quot;why: {}&quot;, record.why);</span>
+<span class="add">+        if let Some(ref how) = record.how {</span>
+<span class="add">+            println!(&quot;how: {}&quot;, how);</span>
+<span class="add">+        }</span>
+<span class="add">+        if let Some(ref backup) = record.backup {</span>
+<span class="add">+            println!(&quot;backup: {}&quot;, backup);</span>
+<span class="add">+        }</span>
+<span class="add">+        println!(&quot;time: {}&quot;, record.timestamp);</span>
+<span class="add">+        println!();</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+fn cmd_sync(push: bool, pull: bool) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    if !Path::new(&quot;.arf&quot;).exists() {</span>
+<span class="add">+        return Err(anyhow!(&quot;ARF not initialized. Run &#39;arf init&#39; first.&quot;));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    // Default to both if neither specified</span>
+<span class="add">+    let (do_pull, do_push) = if !push &amp;&amp; !pull {</span>
+<span class="add">+        (true, true)</span>
+<span class="add">+    } else {</span>
+<span class="add">+        (pull, push)</span>
+<span class="add">+    };</span>
+<span class="add">+</span>
+<span class="add">+    if do_pull {</span>
+<span class="add">+        println!(&quot;Pulling ARF records...&quot;);</span>
+<span class="add">+        let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+            .args([&quot;pull&quot;, &quot;origin&quot;, ARF_BRANCH])</span>
+<span class="add">+            .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+            .output()?;</span>
+<span class="add">+</span>
+<span class="add">+        if output.status.success() {</span>
+<span class="add">+            println!(&quot;✓ Pulled&quot;);</span>
+<span class="add">+        } else {</span>
+<span class="add">+            let stderr = String::from_utf8_lossy(&amp;output.stderr);</span>
+<span class="add">+            if stderr.contains(&quot;couldn&#39;t find remote ref&quot;) {</span>
+<span class="add">+                println!(&quot;  No remote ARF branch yet&quot;);</span>
+<span class="add">+            } else {</span>
+<span class="add">+                println!(&quot;  Pull failed: {}&quot;, stderr.trim());</span>
+<span class="add">+            }</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    if do_push {</span>
+<span class="add">+        println!(&quot;Pushing ARF records...&quot;);</span>
+<span class="add">+        let output = Command::new(&quot;git&quot;)</span>
+<span class="add">+            .args([&quot;push&quot;, &quot;-u&quot;, &quot;origin&quot;, ARF_BRANCH])</span>
+<span class="add">+            .current_dir(&quot;.arf&quot;)</span>
+<span class="add">+            .output()?;</span>
+<span class="add">+</span>
+<span class="add">+        if output.status.success() {</span>
+<span class="add">+            println!(&quot;✓ Pushed&quot;);</span>
+<span class="add">+        } else {</span>
+<span class="add">+            let stderr = String::from_utf8_lossy(&amp;output.stderr);</span>
+<span class="add">+            println!(&quot;  Push failed: {}&quot;, stderr.trim());</span>
+<span class="add">+        }</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+    <article class="commit" id="commit-8f81b056d8ada338b968c1575dbb07cf3290039a">
+      <header class="commit-header">
+        <span class="sha">8f81b056</span>
+        <span class="commit-message">feat(export): scaffolding for arf export --format html --output &lt;dir&gt;</span>
+        <span class="timestamp">2026-06-08T09:01:32-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Render real HTML for arf export --format html using Tera</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Stub page (step 1) doesn&#x27;t earn its keep; the viewer needs commit-grouped records, diffs, and per-file anchors so the trail is actually browsable.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Bundle index.html + style.css via include_str!; group records by commit; shell out to git show for diffs; color add&#x2F;del&#x2F;hunk lines into spans; write index.html + style.css into out_dir.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-08T16:40:22.198401378+00:00</span></div>
+              
+              
+                <div class="files">
+                  <span class="file-ref">src&#x2F;commands&#x2F;html.rs</span><span class="file-ref">src&#x2F;commands&#x2F;html_templates&#x2F;style.css</span>
+                </div>
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/src/commands/export.rs b/src/commands/export.rs
+index 518e06f..2314c2e 100644
+--- a/src/commands/export.rs
++++ b/src/commands/export.rs
+<span class="hunk">@@ -1,29 +1,38 @@</span>
+ //! `arf export` - machine-shaped output for downstream consumers.
+ //!
+<span class="del">-//! Selection mirrors `log` (--commit, optional --since), but the</span>
+<span class="del">-//! output format is JSON / JSONL / TOML rather than human-readable.</span>
+<span class="del">-//!</span>
+<span class="del">-//! --since accepts either a bare date (&quot;2026-06-01&quot;) or a full</span>
+<span class="del">-//! RFC-3339 timestamp. Bare dates widen to start-of-day UTC so users</span>
+<span class="del">-//! don&#39;t have to remember timezone formatting.</span>
+<span class="add">+//! Selection mirrors `log` (--commit, optional --since); the output</span>
+<span class="add">+//! shape varies by --format. Stream formats (json, jsonl, toml) go</span>
+<span class="add">+//! to stdout. The html format produces a directory of files instead</span>
+<span class="add">+//! and therefore requires --output &lt;dir&gt;; we validate that combination</span>
+<span class="add">+//! up front rather than silently dumping HTML to a terminal.</span>
+ 
+<span class="add">+use crate::commands::html;</span>
+ use crate::record::ArfRecord;
+ use crate::store::load_records;
+ use anyhow::{anyhow, Result};
+ use serde::Serialize;
+<span class="add">+use std::path::PathBuf;</span>
+ 
+ #[derive(Clone, Copy, Debug, clap::ValueEnum)]
+ pub enum ExportFormat {
+     Json,
+     Jsonl,
+     Toml,
+<span class="add">+    Html,</span>
+ }
+ 
+ pub fn run(
+     commit: Option&lt;String&gt;,
+     since: Option&lt;String&gt;,
+     format: ExportFormat,
+<span class="add">+    output: Option&lt;PathBuf&gt;,</span>
+ ) -&gt; Result&lt;()&gt; {
+<span class="add">+    if matches!(format, ExportFormat::Html) &amp;&amp; output.is_none() {</span>
+<span class="add">+        return Err(anyhow!(</span>
+<span class="add">+            &quot;--format html writes a directory; pass --output &lt;dir&gt;&quot;</span>
+<span class="add">+        ));</span>
+<span class="add">+    }</span>
+<span class="add">+</span>
+     let mut records = load_records(commit.as_deref())?;
+ 
+     if let Some(since_str) = since {
+<span class="hunk">@@ -70,6 +79,12 @@ pub fn run(</span>
+             let out = toml::to_string_pretty(&amp;wrapper)?;
+             print!(&quot;{}&quot;, out);
+         }
+<span class="add">+        ExportFormat::Html =&gt; {</span>
+<span class="add">+            // --output is required and validated at the top of run().</span>
+<span class="add">+            let out_dir = output.unwrap();</span>
+<span class="add">+            html::render(&amp;plain, &amp;out_dir)?;</span>
+<span class="add">+            println!(&quot;Wrote {} record(s) to {}&quot;, plain.len(), out_dir.display());</span>
+<span class="add">+        }</span>
+     }
+ 
+     Ok(())
+diff --git a/src/commands/html.rs b/src/commands/html.rs
+new file mode 100644
+index 0000000..aa28fa0
+--- /dev/null
++++ b/src/commands/html.rs
+<span class="hunk">@@ -0,0 +1,34 @@</span>
+<span class="add">+//! HTML output for `arf export --format html`.</span>
+<span class="add">+//!</span>
+<span class="add">+//! Step 1 scaffolding: writes a stub index.html into the output</span>
+<span class="add">+//! directory. Confirms the pipeline (validate output, create dir,</span>
+<span class="add">+//! write file). Step 2 adds real Tera templates + per-commit pages.</span>
+<span class="add">+</span>
+<span class="add">+use crate::record::ArfRecord;</span>
+<span class="add">+use anyhow::{Context, Result};</span>
+<span class="add">+use std::path::Path;</span>
+<span class="add">+</span>
+<span class="add">+/// Render the given records into a static HTML site at `out_dir`.</span>
+<span class="add">+///</span>
+<span class="add">+/// Creates the output directory if it doesn&#39;t exist. Will not</span>
+<span class="add">+/// overwrite an existing index.html silently - this is the</span>
+<span class="add">+/// scaffolding stub; the real implementation will be more</span>
+<span class="add">+/// considerate of pre-existing files.</span>
+<span class="add">+pub fn render(records: &amp;[&amp;ArfRecord], out_dir: &amp;Path) -&gt; Result&lt;()&gt; {</span>
+<span class="add">+    std::fs::create_dir_all(out_dir)</span>
+<span class="add">+        .with_context(|| format!(&quot;creating output dir {}&quot;, out_dir.display()))?;</span>
+<span class="add">+</span>
+<span class="add">+    // Minimal placeholder so the pipeline is end-to-end. Step 2</span>
+<span class="add">+    // replaces this with a real Tera template that renders the</span>
+<span class="add">+    // timeline, per-commit views, etc.</span>
+<span class="add">+    let body = format!(</span>
+<span class="add">+        &quot;&lt;!DOCTYPE html&gt;\n&lt;html lang=\&quot;en\&quot;&gt;\n&lt;head&gt;\n  &lt;meta charset=\&quot;utf-8\&quot;&gt;\n  &lt;title&gt;ARF trail&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;h1&gt;ARF trail&lt;/h1&gt;\n  &lt;p&gt;{} record(s). Real rendering ships in the next iteration.&lt;/p&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n&quot;,</span>
+<span class="add">+        records.len()</span>
+<span class="add">+    );</span>
+<span class="add">+</span>
+<span class="add">+    let index = out_dir.join(&quot;index.html&quot;);</span>
+<span class="add">+    std::fs::write(&amp;index, body)</span>
+<span class="add">+        .with_context(|| format!(&quot;writing {}&quot;, index.display()))?;</span>
+<span class="add">+</span>
+<span class="add">+    Ok(())</span>
+<span class="add">+}</span>
+diff --git a/src/commands/mod.rs b/src/commands/mod.rs
+index 5418f50..ce92e7e 100644
+--- a/src/commands/mod.rs
++++ b/src/commands/mod.rs
+<span class="hunk">@@ -5,6 +5,7 @@ pub mod browse;</span>
+ pub mod diff;
+ pub mod export;
+ pub mod graph;
+<span class="add">+pub mod html;</span>
+ pub mod init;
+ pub mod log;
+ pub mod record;
+diff --git a/src/main.rs b/src/main.rs
+index 420b8f0..76628be 100644
+--- a/src/main.rs
++++ b/src/main.rs
+<span class="hunk">@@ -116,9 +116,15 @@ enum Commands {</span>
+         #[arg(long)]
+         since: Option&lt;String&gt;,
+ 
+<span class="del">-        /// Output format: json (default), jsonl (one record per line), toml</span>
+<span class="add">+        /// Output format: json (default), jsonl (one record per line),</span>
+<span class="add">+        /// toml, html (requires --output)</span>
+         #[arg(short, long, default_value = &quot;json&quot;)]
+         format: ExportFormat,
+<span class="add">+</span>
+<span class="add">+        /// Output directory. Required for --format html (which writes</span>
+<span class="add">+        /// a directory of files); ignored by stdout-streaming formats.</span>
+<span class="add">+        #[arg(short, long)]</span>
+<span class="add">+        output: Option&lt;std::path::PathBuf&gt;,</span>
+     },
+ }
+ 
+<span class="hunk">@@ -161,7 +167,8 @@ fn main() -&gt; Result&lt;()&gt; {</span>
+             commit,
+             since,
+             format,
+<span class="del">-        } =&gt; commands::export::run(commit, since, format)?,</span>
+<span class="add">+            output,</span>
+<span class="add">+        } =&gt; commands::export::run(commit, since, format, output)?,</span>
+     }
+ 
+     Ok(())
+diff --git a/tests/cli.rs b/tests/cli.rs
+index 9e17095..3a04321 100644
+--- a/tests/cli.rs
++++ b/tests/cli.rs
+<span class="hunk">@@ -427,6 +427,40 @@ fn why_reports_when_no_records_exist() {</span>
+         .stdout(str::contains(&quot;No ARF records&quot;));
+ }
+ 
+<span class="add">+#[test]</span>
+<span class="add">+fn export_html_requires_output_flag() {</span>
+<span class="add">+    let dir = arf_repo();</span>
+<span class="add">+    arf(&amp;dir)</span>
+<span class="add">+        .args([&quot;export&quot;, &quot;--format&quot;, &quot;html&quot;])</span>
+<span class="add">+        .assert()</span>
+<span class="add">+        .failure()</span>
+<span class="add">+        .stderr(str::contains(&quot;--output&quot;));</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+<span class="add">+#[test]</span>
+<span class="add">+fn export_html_writes_index_to_output_dir() {</span>
+<span class="add">+    let dir = arf_repo();</span>
+<span class="add">+    arf(&amp;dir)</span>
+<span class="add">+        .args([&quot;record&quot;, &quot;--what&quot;, &quot;Sample change&quot;, &quot;--why&quot;, &quot;Test&quot;])</span>
+<span class="add">+        .assert()</span>
+<span class="add">+        .success();</span>
+<span class="add">+</span>
+<span class="add">+    let out = dir.path().join(&quot;viewer&quot;);</span>
+<span class="add">+    arf(&amp;dir)</span>
+<span class="add">+        .args([</span>
+<span class="add">+            &quot;export&quot;,</span>
+<span class="add">+            &quot;--format&quot;,</span>
+<span class="add">+            &quot;html&quot;,</span>
+<span class="add">+            &quot;--output&quot;,</span>
+<span class="add">+            out.to_str().unwrap(),</span>
+<span class="add">+        ])</span>
+<span class="add">+        .assert()</span>
+<span class="add">+        .success();</span>
+<span class="add">+</span>
+<span class="add">+    let index = std::fs::read_to_string(out.join(&quot;index.html&quot;)).expect(&quot;index.html should exist&quot;);</span>
+<span class="add">+    assert!(index.contains(&quot;ARF trail&quot;));</span>
+<span class="add">+}</span>
+<span class="add">+</span>
+ #[test]
+ fn export_empty_when_no_records() {
+     let dir = arf_repo();
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+    <article class="commit" id="commit-9088e8a1fb85cee30c5ef2a1a5b6c1d9cc538941">
+      <header class="commit-header">
+        <span class="sha">9088e8a1</span>
+        <span class="commit-message">Merge branch &#x27;docs&#x2F;readme-update&#x27;</span>
+        <span class="timestamp">2026-06-07T13:52:13-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Ship scaffolding for arf export --format html</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Pipeline confirmed end-to-end against the arf repo&#x27;s own records (20 records written to a stub index.html in &#x2F;tmp&#x2F;arf-html). Error path verified: --format html without --output fails with a clear message. Two new integration tests pin the behavior so step 2 can rewrite render() without breaking the CLI contract.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Added Html to ExportFormat, added Option&lt;PathBuf&gt; output to the Export variant, validated the combination at the top of cmd_export, wrote a stub commands&#x2F;html.rs::render that writes a placeholder index.html. Tests: export_html_requires_output_flag (error message contains --output) and export_html_writes_index_to_output_dir (round-trip writes a file containing &#x27;ARF trail&#x27;).</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-08T15:58:25.686858364+00:00</span></div>
+              
+              
+                <div class="files">
+                  <span class="file-ref">src&#x2F;main.rs</span><span class="file-ref">src&#x2F;commands&#x2F;export.rs</span><span class="file-ref">src&#x2F;commands&#x2F;html.rs</span><span class="file-ref">tests&#x2F;cli.rs</span>
+                </div>
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Scaffolding for arf export --format html --output &lt;dir&gt;</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Step 1 of the html-export feature - just plumbing, no real templates yet. Goal: CLI accepts the new format + flag, errors cleanly when --output is missing for html, writes a placeholder index.html. Step 2 (real Tera templates + per-commit pages) is purely additive on top.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Add Html variant to ExportFormat enum. Add Option&lt;PathBuf&gt; output arg to the Export command. In cmd_export, validate that html requires --output. New commands&#x2F;html.rs with render() that takes records + output dir, writes a stub index.html. Wire dispatch.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-08T15:50:24.259080909+00:00</span></div>
+              
+              
+                <div class="files">
+                  <span class="file-ref">src&#x2F;main.rs</span><span class="file-ref">src&#x2F;commands&#x2F;export.rs</span><span class="file-ref">src&#x2F;commands&#x2F;html.rs</span>
+                </div>
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-95d823c4c1c2a329a5f70fa809feeb0da90fb49b">
+      <header class="commit-header">
+        <span class="sha">95d823c4</span>
+        <span class="commit-message">Merge branch &#x27;release&#x2F;v20260607.0.2&#x27;</span>
+        <span class="timestamp">2026-06-07T08:20:51-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Land the module split per the earlier plan</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">All 13 integration tests passed after the refactor with no behavior changes - the test suite paid off exactly as anticipated. Largest file is now browse.rs at 436 lines (all unavoidable TUI rendering); everything else is under 110 lines. main.rs shrunk from 1264 lines to 149 (pure CLI parsing + dispatch).</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Added [lib] section to Cargo.toml so tests + main both go through arf_cli. Created src&#x2F;{lib,record,store}.rs and src&#x2F;commands&#x2F;{init,record,log,sync,graph,diff,export,spec,browse}.rs. Each command exposes pub fn run(...). main.rs is now thin clap parsing + dispatch. ExportFormat lives with its consumer in commands&#x2F;export.rs since nothing else uses it.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:37:17.084820234+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Split src&#x2F;main.rs into focused modules (record type, store, per-command files)</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">main.rs is ~830 lines mixing eight command implementations, the TUI browser, serialization types, and CLI parsing. Finding code requires scrolling; editing one command means navigating past unrelated context; the TUI alone is ~300 lines that has nothing to do with everything else. The integration test suite gives us a safety net (13 tests, ~110ms) so the refactor is verifiable in seconds. Doing it now also helps the eventual blog post - people will look at the source.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Carve into: record.rs (ArfRecord type), store.rs (load_records, .arf paths), commands&#x2F;{init,record,log,sync,graph,diff,export,spec,browse}.rs, plus lib.rs that re-exports for tests. main.rs shrinks to CLI parsing + a dispatch match. Each command becomes pub fn run(...) -&gt; Result&lt;()&gt;. Move types and helpers as I touch each command. Tests run after each module is moved to catch regressions immediately.</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">If something breaks subtly that the tests don&#x27;t catch, git revert the merge commit. The refactor is purely structural - no behavior changes - so a revert is safe.</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:21:22.559752878+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-b491c08831ae068a597a3fee1da6ccb6483a2a13">
+      <header class="commit-header">
+        <span class="sha">b491c088</span>
+        <span class="commit-message">Merge branch &#x27;release&#x2F;v20260607.0.1&#x27;</span>
+        <span class="timestamp">2026-06-07T07:52:37-07:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Implement arf export per the earlier plan</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Closing the loop on b491c088. JSON via serde_json was the right call - no hand-rolled fallback needed, the binary stayed small. Helper extraction landed cleanly; cmd_log behavior unchanged (verified manually).</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Added serde_json dep, load_records() helper, Export variant + ExportFormat enum, cmd_export dispatch. --since accepts bare date OR rfc3339; widened bare date to 00:00:00Z so users don&#x27;t have to format timezones. TOML output wraps records in a [[records]] array since TOML has no top-level array.</span></div>
+              
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:09:29.832282271+00:00</span></div>
+              
+              
+            </div>
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Add &#x27;arf export&#x27; subcommand that dumps records as JSON to stdout</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Records are useful inputs to other tooling - CI scripts that check for missing reasoning, dashboards that visualize agent behavior, multi-agent handoffs. TOML files in a parallel git branch are the storage form; JSON over stdout is the interchange form. Without export, anyone wanting to consume ARF data has to re-implement the record-walking logic.</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Extract record-loading from cmd_log into a shared load_records() helper. Add cmd_export using it with --commit&#x2F;--since&#x2F;--format flags. JSON via serde_json. Default emits a JSON array; --format jsonl emits newline-delimited JSON for streaming consumers.</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">If serde_json bloats the binary too much, fall back to hand-rolled JSON. Revert the commit if cmd_log regresses - the helper extraction is the riskier piece.</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">2026-06-07T15:04:59.059000773+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+    </article>
+  
+    <article class="commit" id="commit-dda9b15061cd870ccd456ff86ea03282a6f90f46">
+      <header class="commit-header">
+        <span class="sha">dda9b150</span>
+        <span class="commit-message">Switch from JSON to TOML</span>
+        <span class="timestamp">2026-02-02T13:53:24-08:00</span>
+      </header>
+
+      <div class="records">
+        
+          
+            <div class="record">
+              <div class="field"><span class="label">What</span><span class="value">Implement ARF CLI v0.1</span></div>
+              <div class="field"><span class="label">Why</span><span class="value">Need reference implementation for Agent Reasoning Format spec</span></div>
+              <div class="field"><span class="label">How</span><span class="value">Rust CLI with init&#x2F;record&#x2F;log&#x2F;sync commands, orphan branch storage</span></div>
+              <div class="field"><span class="label">Backup</span><span class="value">Revert to spec-only if implementation has issues</span></div>
+              
+              
+              <div class="field"><span class="label">Meta</span><span class="value">claude · 2026-02-02T23:14:19.855426001+00:00</span></div>
+              
+              
+            </div>
+          
+        
+      </div>
+
+      
+      <div class="diff">
+        <details>
+          <summary>diff</summary>
+          <pre>diff --git a/README.md b/README.md
+index 8009b74..9122bdd 100644
+--- a/README.md
++++ b/README.md
+<span class="hunk">@@ -11,15 +11,13 @@ AI agents modify code, make decisions, take actions. Their reasoning is:</span>
+ 
+ ## The Solution
+ 
+<span class="del">-ARF is a simple schema for capturing agent reasoning:</span>
+<span class="del">-</span>
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Add validation to prevent SQL injection&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Email field passes unsanitized input to query&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Use parameterized queries in register_user()&quot;,</span>
+<span class="del">-  &quot;backup&quot;: &quot;Revert if tests fail&quot;</span>
+<span class="del">-}</span>
+<span class="add">+ARF is a simple TOML schema for capturing agent reasoning:</span>
+<span class="add">+</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Add validation to prevent SQL injection&quot;</span>
+<span class="add">+why = &quot;Email field passes unsanitized input to query&quot;</span>
+<span class="add">+how = &quot;Use parameterized queries in register_user()&quot;</span>
+<span class="add">+backup = &quot;Revert if tests fail&quot;</span>
+ ```
+ 
+ ## Use Cases
+diff --git a/SPEC.md b/SPEC.md
+index 472d670..8834b79 100644
+--- a/SPEC.md
++++ b/SPEC.md
+<span class="hunk">@@ -14,17 +14,17 @@ agents to declare intent and capture reasoning in a way that:</span>
+ 
+ ## Core Schema
+ 
+<span class="del">-An ARF record has these fields:</span>
+<span class="del">-</span>
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;string (required)&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;string (required)&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;string (optional)&quot;,</span>
+<span class="del">-  &quot;backup&quot;: &quot;string (optional)&quot;,</span>
+<span class="del">-  &quot;outcome&quot;: &quot;success | failure | partial (optional)&quot;,</span>
+<span class="del">-  &quot;context&quot;: {}</span>
+<span class="del">-}</span>
+<span class="add">+An ARF record in TOML:</span>
+<span class="add">+</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;string (required)&quot;</span>
+<span class="add">+why = &quot;string (required)&quot;</span>
+<span class="add">+how = &quot;string (optional)&quot;</span>
+<span class="add">+backup = &quot;string (optional)&quot;</span>
+<span class="add">+outcome = &quot;success | failure | partial (optional)&quot;</span>
+<span class="add">+</span>
+<span class="add">+[context]</span>
+<span class="add">+# arbitrary metadata</span>
+ ```
+ 
+ ### Required Fields
+<span class="hunk">@@ -52,46 +52,40 @@ Can include details: `{&quot;outcome&quot;: &quot;failure&quot;, &quot;reason&quot;: &quot;tests failed&quot;}`.</span>
+ 
+ Agent declares intent BEFORE acting:
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Add input validation to user registration&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Current code allows SQL injection via email field&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Add parameterized queries in register_user()&quot;,</span>
+<span class="del">-  &quot;backup&quot;: &quot;Revert commit if integration tests fail&quot;</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Add input validation to user registration&quot;</span>
+<span class="add">+why = &quot;Current code allows SQL injection via email field&quot;</span>
+<span class="add">+how = &quot;Add parameterized queries in register_user()&quot;</span>
+<span class="add">+backup = &quot;Revert commit if integration tests fail&quot;</span>
+ ```
+ 
+ ### 2. Post-Action Record
+ 
+ Agent records what happened AFTER acting:
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Add input validation to user registration&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Current code allows SQL injection via email field&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Added parameterized queries in register_user()&quot;,</span>
+<span class="del">-  &quot;outcome&quot;: &quot;success&quot;,</span>
+<span class="del">-  &quot;context&quot;: {</span>
+<span class="del">-    &quot;commit&quot;: &quot;abc123&quot;,</span>
+<span class="del">-    &quot;files_changed&quot;: [&quot;src/auth.rs&quot;]</span>
+<span class="del">-  }</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Add input validation to user registration&quot;</span>
+<span class="add">+why = &quot;Current code allows SQL injection via email field&quot;</span>
+<span class="add">+how = &quot;Added parameterized queries in register_user()&quot;</span>
+<span class="add">+outcome = &quot;success&quot;</span>
+<span class="add">+</span>
+<span class="add">+[context]</span>
+<span class="add">+commit = &quot;abc123&quot;</span>
+<span class="add">+files_changed = [&quot;src/auth.rs&quot;]</span>
+ ```
+ 
+ ### 3. Multi-Agent Handoff
+ 
+ Agent A passes structured reasoning to Agent B:
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Identified N+1 query in user_posts()&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Each post triggers separate author lookup&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Recommend eager loading with includes(:author)&quot;,</span>
+<span class="del">-  &quot;context&quot;: {</span>
+<span class="del">-    &quot;source_agent&quot;: &quot;analyzer&quot;,</span>
+<span class="del">-    &quot;confidence&quot;: 0.95</span>
+<span class="del">-  }</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Identified N+1 query in user_posts()&quot;</span>
+<span class="add">+why = &quot;Each post triggers separate author lookup&quot;</span>
+<span class="add">+how = &quot;Recommend eager loading with includes(:author)&quot;</span>
+<span class="add">+</span>
+<span class="add">+[context]</span>
+<span class="add">+source_agent = &quot;analyzer&quot;</span>
+<span class="add">+confidence = 0.95</span>
+ ```
+ 
+ ## Prompt Template
+<span class="hunk">@@ -120,52 +114,46 @@ DO NOT narrate your investigation. Output ONLY the structured reasoning.</span>
+ 
+ ### Bug Fix
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Fix off-by-one error in pagination&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Users report missing last item on each page. Loop uses &lt; instead of &lt;=&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Change line 42: `i &lt; count` to `i &lt;= count`&quot;,</span>
+<span class="del">-  &quot;backup&quot;: &quot;Revert if pagination tests fail&quot;,</span>
+<span class="del">-  &quot;outcome&quot;: &quot;success&quot;,</span>
+<span class="del">-  &quot;context&quot;: {</span>
+<span class="del">-    &quot;issue&quot;: &quot;#123&quot;,</span>
+<span class="del">-    &quot;commit&quot;: &quot;def456&quot;</span>
+<span class="del">-  }</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Fix off-by-one error in pagination&quot;</span>
+<span class="add">+why = &quot;Users report missing last item on each page. Loop uses &lt; instead of &lt;=&quot;</span>
+<span class="add">+how = &quot;Change line 42: `i &lt; count` to `i &lt;= count`&quot;</span>
+<span class="add">+backup = &quot;Revert if pagination tests fail&quot;</span>
+<span class="add">+outcome = &quot;success&quot;</span>
+<span class="add">+</span>
+<span class="add">+[context]</span>
+<span class="add">+issue = &quot;#123&quot;</span>
+<span class="add">+commit = &quot;def456&quot;</span>
+ ```
+ 
+ ### Architecture Decision
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Use Redis for session storage instead of PostgreSQL&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;Session lookups are 100x more frequent than writes. Redis reduces p99 latency from 50ms to 2ms&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Add redis-rs dependency, implement SessionStore trait&quot;,</span>
+<span class="del">-  &quot;backup&quot;: &quot;Keep PostgreSQL adapter as fallback if Redis unavailable&quot;</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Use Redis for session storage instead of PostgreSQL&quot;</span>
+<span class="add">+why = &quot;Session lookups are 100x more frequent than writes. Redis reduces p99 latency from 50ms to 2ms&quot;</span>
+<span class="add">+how = &quot;Add redis-rs dependency, implement SessionStore trait&quot;</span>
+<span class="add">+backup = &quot;Keep PostgreSQL adapter as fallback if Redis unavailable&quot;</span>
+ ```
+ 
+ ### Code Review Finding
+ 
+<span class="del">-```json</span>
+<span class="del">-{</span>
+<span class="del">-  &quot;what&quot;: &quot;Flag potential race condition in cache invalidation&quot;,</span>
+<span class="del">-  &quot;why&quot;: &quot;delete() and set() not atomic - stale data possible under load&quot;,</span>
+<span class="del">-  &quot;how&quot;: &quot;Recommend using WATCH/MULTI/EXEC or lua script&quot;,</span>
+<span class="del">-  &quot;context&quot;: {</span>
+<span class="del">-    &quot;file&quot;: &quot;src/cache.rs&quot;,</span>
+<span class="del">-    &quot;line&quot;: 89,</span>
+<span class="del">-    &quot;severity&quot;: &quot;medium&quot;</span>
+<span class="del">-  }</span>
+<span class="del">-}</span>
+<span class="add">+```toml</span>
+<span class="add">+what = &quot;Flag potential race condition in cache invalidation&quot;</span>
+<span class="add">+why = &quot;delete() and set() not atomic - stale data possible under load&quot;</span>
+<span class="add">+how = &quot;Recommend using WATCH/MULTI/EXEC or lua script&quot;</span>
+<span class="add">+</span>
+<span class="add">+[context]</span>
+<span class="add">+file = &quot;src/cache.rs&quot;</span>
+<span class="add">+line = 89</span>
+<span class="add">+severity = &quot;medium&quot;</span>
+ ```
+ 
+ ## File Format
+ 
+ ARF records can be stored as:
+ 
+<span class="del">-- **JSON** - Single record or array of records</span>
+<span class="del">-- **JSONL** - One record per line (for logs/streams)</span>
+<span class="add">+- **TOML** - Single record per `.arf` file or embedded in other TOML</span>
+<span class="add">+- **TOML stream** - Multiple `[[record]]` entries in one file</span>
+ - **Embedded** - In commit messages, PR descriptions, comments
+ 
+ ## Versioning
+</pre>
+        </details>
+      </div>
+      
+    </article>
+  
+  </main>
+
+  <footer class="site">
+    Generated by <code>arf export --format html</code>.
+  </footer>
+</body>
+</html>
