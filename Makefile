@@ -1,4 +1,4 @@
-.PHONY: help version-bump release build test clean clippy
+.PHONY: help version-bump release build test clean clippy trail
 
 # Auto-generate version from today's date with auto-incrementing patch.
 # Format: YYYYMMDD.0.X where X increments if releasing multiple times per day.
@@ -26,6 +26,7 @@ help:
 	@echo "  make build                         - Build release binary"
 	@echo "  make test                          - Run tests"
 	@echo "  make clippy                        - Run clippy"
+	@echo "  make trail                         - Regenerate docs/trail/ from this repo's ARF history"
 	@echo "  make clean                         - Clean build artifacts"
 	@echo ""
 	@echo "Next version will be: $(VERSION)"
@@ -46,6 +47,15 @@ version-bump:
 		git commit -m "chore: bump version to $(VERSION)"; \
 		echo "Version bumped to $(VERSION)"; \
 		echo "Commit created"; \
+	fi
+	@echo "Regenerating docs/trail/..."
+	@$(MAKE) --no-print-directory trail
+	@git add docs/trail
+	@if git diff --cached --quiet; then \
+		echo "Trail unchanged; nothing to commit."; \
+	else \
+		git commit -m "docs: regenerate ARF trail for v$(VERSION)"; \
+		echo "Trail committed"; \
 	fi
 	@echo ""
 	@echo "On branch release/v$(VERSION)"
@@ -88,6 +98,13 @@ test:
 # Run clippy
 clippy:
 	cargo clippy -- -D warnings
+
+# Regenerate the static ARF trail viewer into docs/trail/. Used by the
+# GitHub Pages landing page; called automatically as part of `release`.
+trail:
+	@cargo build --release --quiet
+	@rm -rf docs/trail
+	@./target/release/arf export --format html --output docs/trail
 
 # Clean build artifacts
 clean:

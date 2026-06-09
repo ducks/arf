@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARF - Agent Reasoning Format</title>
+  <meta name="description" content="ARF tracks AI agent reasoning alongside git so reviewers see what the agent thought, not just what it changed. CLI installable via cargo.">
+  <meta name="author" content="Jake Goldsborough">
+  <link rel="canonical" href="https://ducks.github.io/arf/">
+  <meta name="theme-color" content="#fbf1c7">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ducks.github.io/arf/">
+  <meta property="og:title" content="ARF - Agent Reasoning Format">
+  <meta property="og:description" content="Track AI agent reasoning alongside git. See what the agent thought, not just what it changed.">
+  <meta property="og:site_name" content="ARF">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="ARF - Agent Reasoning Format">
+  <meta name="twitter:description" content="Track AI agent reasoning alongside git. See what the agent thought, not just what it changed.">
+
+  <style>
+    @font-face {
+      font-family: 'Fifties';
+      src: url('fonts/VVDSFifties-ExpBold.woff2') format('woff2'),
+           url('fonts/VVDSFifties-ExpBold.woff') format('woff');
+      font-weight: bold;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Atkinson Hyperlegible';
+      src: url('fonts/Atkinson-Hyperlegible-Regular-102a.woff2') format('woff2'),
+           url('fonts/Atkinson-Hyperlegible-Regular-102.woff') format('woff');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Atkinson Hyperlegible';
+      src: url('fonts/Atkinson-Hyperlegible-Bold-102a.woff2') format('woff2'),
+           url('fonts/Atkinson-Hyperlegible-Bold-102.woff') format('woff');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      /* Gruvbox Light */
+      --bg-color: #fbf1c7;
+      --text-color: #3c3836;
+      --heading-color: #282828;
+      --heading-secondary: #504945;
+      --border-color: #d5c4a1;
+      --code-bg: #ebdbb2;
+      --link-color: #8f3f71;
+      --muted-color: #7c6f64;
+    }
+
+    [data-theme="dark"] {
+      /* Gruvbox Dark */
+      --bg-color: #282828;
+      --text-color: #ebdbb2;
+      --heading-color: #fbf1c7;
+      --heading-secondary: #d5c4a1;
+      --border-color: #504945;
+      --code-bg: #3c3836;
+      --link-color: #d3869b;
+      --muted-color: #928374;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg-color: #282828;
+        --text-color: #ebdbb2;
+        --heading-color: #fbf1c7;
+        --heading-secondary: #d5c4a1;
+        --border-color: #504945;
+        --code-bg: #3c3836;
+        --link-color: #d3869b;
+        --muted-color: #928374;
+      }
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--bg-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Fifties', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    h1 { font-size: 3.5rem; margin-bottom: 0.5rem; color: var(--heading-color); }
+    h2 { font-size: 2.2rem; margin-top: 2rem; margin-bottom: 1rem; color: var(--heading-color); border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; }
+    h3 { font-size: 1.6rem; margin-top: 1.5rem; margin-bottom: 0.8rem; color: var(--heading-secondary); }
+
+    p { margin-bottom: 1rem; }
+
+    code {
+      background: var(--code-bg);
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: "Monaco", "Courier New", monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1rem;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+
+    pre code { background: none; padding: 0; }
+
+    ul { margin-left: 2rem; margin-bottom: 1rem; }
+    ul li { margin-bottom: 0.5rem; }
+
+    strong { color: var(--heading-color); font-weight: 600; }
+
+    a { color: var(--link-color); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--muted-color);
+      font-size: 0.9rem;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-color);
+      transition: all 0.3s;
+    }
+
+    nav { margin-bottom: 2rem; }
+    nav a {
+      margin-right: 1.5rem;
+      font-family: "Fifties";
+      font-size: 2rem;
+      text-transform: uppercase;
+    }
+
+    blockquote {
+      background: var(--code-bg);
+      border-left: 10px solid var(--link-color);
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+
+  <header>
+    <h1>ARF</h1>
+    <nav>
+      <a href="/arf/">Home</a>
+      <a href="/arf/trail/">Live trail</a>
+      <a href="https://github.com/ducks/arf">GitHub</a>
+      <a href="https://crates.io/crates/arf-cli">crates.io</a>
+    </nav>
+  </header>
+
+  <main>
+    <blockquote>
+      Agent Reasoning Format. Track what the agent thought, not just what it changed.
+    </blockquote>
+
+    <section>
+      <h2>What is ARF?</h2>
+      <p>ARF is a TOML schema plus a CLI for capturing an AI agent's reasoning alongside the commits it produces. Records live on an orphan <code>arf</code> git branch, so the reasoning travels with the repo but never pollutes <code>main</code>'s history.</p>
+
+      <p>ARF gives you:</p>
+      <ul>
+        <li><code>arf record</code> - agents emit what / why / how / backup before and after significant work</li>
+        <li><code>arf why &lt;file&gt;:&lt;line&gt;</code> - <em>git blame, but for reasoning</em>: resolve a line to the commit that wrote it and surface the matching records</li>
+        <li><code>arf export --format html</code> - generate a static viewer of the whole trail</li>
+        <li>File-and-line anchoring so a record can scope itself to <code>src/foo.rs:42-76</code> rather than the whole commit</li>
+        <li>An orphan-branch storage model so reasoning never touches your working tree</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Install</h2>
+      <pre><code>cargo install arf-cli</code></pre>
+    </section>
+
+    <section>
+      <h2>Quick start</h2>
+      <pre><code>arf init
+arf record \
+  --what "Refactor auth middleware" \
+  --why "Legal flagged session-token storage for compliance" \
+  --file src/auth.rs:42-76
+arf log
+arf why src/auth.rs:55</code></pre>
+      <p>The <code>--file</code> flag is what makes <code>arf why</code> work later: a record can scope itself to a path, a line, or a range, and lookups walk back via <code>git blame</code> to find the right commit.</p>
+    </section>
+
+    <section>
+      <h2>The live trail</h2>
+      <p>ARF dogfoods itself. The <a href="/arf/trail/">live trail</a> is this repo's own ARF history rendered with <code>arf export --format html</code> - every commit grouped with the records that explain it, diffs inline.</p>
+    </section>
+
+    <section>
+      <h2>Why this exists</h2>
+      <p>Commit messages tell you <em>what</em> changed. PR descriptions tell you <em>why</em> the PR exists. Neither captures the moment-to-moment reasoning an agent uses while writing code - the rejected approaches, the constraints it weighed, the rollback plan it had in mind.</p>
+      <p>ARF is a place for that reasoning to live, anchored to the lines it produced, queryable later when a reviewer asks "why does this exist."</p>
+    </section>
+
+    <section>
+      <h2>Resources</h2>
+      <ul>
+        <li><a href="https://github.com/ducks/arf">GitHub repository</a></li>
+        <li><a href="https://crates.io/crates/arf-cli">crates.io page</a></li>
+        <li><a href="/arf/trail/">Live ARF trail for this project</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>ARF by <a href="https://jakegoldsborough.com">Jake Goldsborough</a>. Source on <a href="https://github.com/ducks/arf">GitHub</a>.</p>
+  </footer>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      html.setAttribute('data-theme', savedTheme);
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  </script>
+</body>
+</html>
