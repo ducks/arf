@@ -5,6 +5,7 @@ pub mod browse;
 pub mod diff;
 pub mod export;
 pub mod graph;
+pub mod html;
 pub mod init;
 pub mod log;
 pub mod record;

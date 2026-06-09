@@ -428,6 +428,40 @@ fn why_reports_when_no_records_exist() {
 }
 
 #[test]
+fn export_html_requires_output_flag() {
+    let dir = arf_repo();
+    arf(&dir)
+        .args(["export", "--format", "html"])
+        .assert()
+        .failure()
+        .stderr(str::contains("--output"));
+}
+
+#[test]
+fn export_html_writes_index_to_output_dir() {
+    let dir = arf_repo();
+    arf(&dir)
+        .args(["record", "--what", "Sample change", "--why", "Test"])
+        .assert()
+        .success();
+
+    let out = dir.path().join("viewer");
+    arf(&dir)
+        .args([
+            "export",
+            "--format",
+            "html",
+            "--output",
+            out.to_str().unwrap(),
+        ])
+        .assert()
+        .success();
+
+    let index = std::fs::read_to_string(out.join("index.html")).expect("index.html should exist");
+    assert!(index.contains("ARF trail"));
+}
+
+#[test]
 fn export_empty_when_no_records() {
     let dir = arf_repo();
     let out = arf(&dir).args(["export"]).assert().success();

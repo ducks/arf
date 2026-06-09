@@ -116,9 +116,15 @@ enum Commands {
         #[arg(long)]
         since: Option<String>,
 
-        /// Output format: json (default), jsonl (one record per line), toml
+        /// Output format: json (default), jsonl (one record per line),
+        /// toml, html (requires --output)
         #[arg(short, long, default_value = "json")]
         format: ExportFormat,
+
+        /// Output directory. Required for --format html (which writes
+        /// a directory of files); ignored by stdout-streaming formats.
+        #[arg(short, long)]
+        output: Option<std::path::PathBuf>,
     },
 }
 
@@ -161,7 +167,8 @@ fn main() -> Result<()> {
             commit,
             since,
             format,
-        } => commands::export::run(commit, since, format)?,
+            output,
+        } => commands::export::run(commit, since, format, output)?,
     }
 
     Ok(())
